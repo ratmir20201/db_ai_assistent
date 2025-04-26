@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI-ассистент по БД</title>
+</head>
+<body>
+  <h2>Чат с ассистентом</h2>
+  <div id="chat"></div>
+
+  <input type="text" id="input" placeholder="Введите вопрос..." />
+  <button onclick="sendMessage()">Отправить</button>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("input");
+      const question = input.value;
+      if (!question) return;
+
+      appendMessage("Вы", question);
+      input.value = "";
+
+      const response = await fetch("http://localhost:8000/ask", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ question })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        appendMessage("AI", `SQL: ${data.sql_query}\nРезультат: ${JSON.stringify(data.result)}`);
+      } else {
+        appendMessage("AI", `Ошибка: ${data.detail}`);
+      }
+    }
+
+    function appendMessage(sender, text) {
+      const chat = document.getElementById("chat");
+      const msg = document.createElement("p");
+      msg.innerText = `${sender}: ${text}`;
+      chat.appendChild(msg);
+    }
+  </script>
+</body>
+</html>
