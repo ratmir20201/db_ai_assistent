@@ -7,6 +7,9 @@ load_dotenv()
 class LLMSettings(BaseSettings):
     """Настройки LLM."""
 
+    host: str = ""
+    model: str = ""
+
     class Config:
         env_prefix = "LLM__"
 
@@ -14,7 +17,7 @@ class LLMSettings(BaseSettings):
 class Settings(BaseSettings):
     """Общие настройки приложения."""
 
-    open_ai: LLMSettings = LLMSettings()
+    llm: LLMSettings = LLMSettings()
 
 
 settings = Settings()
