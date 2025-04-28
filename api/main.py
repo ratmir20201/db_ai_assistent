@@ -1,9 +1,8 @@
 import uvicorn
 from fastapi import FastAPI
-
 from llm_client import generate_sql
 from responses import ask_responses
-from schemas import UserRequest, AssistentResponse
+from schemas import AssistentResponse, UserRequest
 from sql_runner import execute_sql_query
 
 app = FastAPI()

@@ -1,12 +1,14 @@
-import requests
-from fastapi import HTTPException
-from starlette.status import HTTP_200_OK
+from functools import lru_cache
 
+import requests
 from config import settings
 from db_parsing import parse_db_to_json
+from fastapi import HTTPException
 from logger import logger
+from starlette.status import HTTP_200_OK
 
 
+@lru_cache
 def generate_sql(prompt: str):
     """Отправляет текстовый запрос в Ollama и возвращает SQL-запрос."""
 
