@@ -1,8 +1,21 @@
 import sqlite3
 
+from fastapi import HTTPException
+from logger import logger
+from starlette.status import HTTP_400_BAD_REQUEST
 
-def execute_sql(sql_query: str):
+
+def execute_sql_query(sql_query: str):
+    """Проверяет sql-запрос на валидность и исполняет его."""
+
     with sqlite3.connect("../db.sqlite3") as conn:
+        is_validate = validate_sql_query(sql_query, conn)
+        if not is_validate:
+            raise HTTPException(
+                status_code=HTTP_400_BAD_REQUEST,
+                detail="LLM сгенерировала некорректный SQL-запрос.",
+            )
+
         cursor = conn.cursor()
         cursor.execute(sql_query)
         result = cursor.fetchall()
@@ -15,3 +28,16 @@ def execute_sql(sql_query: str):
             return column_names
 
         return result
+
+
+def validate_sql_query(sql_query: str, connection: sqlite3.Connection) -> bool:
+    """Проверяет sql-запрос исполняя его и откатываясь."""
+    try:
+        cursor = connection.cursor()
+        cursor.execute("SAVEPOINT validate;")
+        cursor.execute(sql_query)
+        cursor.execute("ROLLBACK TO validate;")
+        return True
+    except sqlite3.Error as e:
+        logger.error("Ошибка синтаксиса SQL: %s", e)
+        return False
