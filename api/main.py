@@ -13,6 +13,7 @@ def ask_bot(user_request: UserRequest):
     sql_query = generate_sql(user_request.question)
     result = execute_sql(sql_query)
     return {"sql_query": sql_query, "result": result}
+    # return {"sql_query": sql_query}
 
 
 if __name__ == "__main__":
