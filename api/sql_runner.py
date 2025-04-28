@@ -1,14 +1,16 @@
 import sqlite3
 
 from fastapi import HTTPException
-from logger import logger
 from starlette.status import HTTP_400_BAD_REQUEST
 
+from config import settings
+from logger import logger
 
-def execute_sql_query(sql_query: str):
+
+def execute_sql_query(sql_query: str) -> list:
     """Проверяет sql-запрос на валидность и исполняет его."""
 
-    with sqlite3.connect("../db.sqlite3") as conn:
+    with sqlite3.connect(settings.parse.absolute_db_path) as conn:
         is_validate = validate_sql_query(sql_query, conn)
         if not is_validate:
             raise HTTPException(

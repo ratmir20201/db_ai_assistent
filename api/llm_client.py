@@ -31,8 +31,9 @@ def generate_sql(prompt: str):
 
 
 def build_chat_messages(prompt: str) -> list[dict]:
-    path_to_db = "../db.sqlite3"
-    db_schema = parse_db_to_json(path_to_db)
+    """Создает messages из ролей, настраивает промпты и отдает полученный messages."""
+
+    db_schema = parse_db_to_json(settings.parse.absolute_db_path)
 
     system_prompt = f"""
     Ты — эксперт по SQLite.

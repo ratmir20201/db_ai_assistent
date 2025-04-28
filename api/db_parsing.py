@@ -1,14 +1,14 @@
 import sqlite3
 
 
-def parse_db_to_json(db_path: str) -> dict[str, dict[str, list]]:
+def parse_db_to_json(db_path: str) -> dict[str, dict[str, list] | list[dict]]:
     """Парсит бд по указанному пути в json."""
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
         tables = cursor.fetchall()
 
-        schema = {"tables": {}, "foreign_keys": []}
+        schema: dict[str, dict | list] = {"tables": {}, "foreign_keys": []}
 
         for (table_name,) in tables:
             if table_name.startswith("sqlite_") or table_name.startswith("django_"):
