@@ -27,6 +27,16 @@ services:
     networks:
       - app-network
 
+  redis:
+    container_name: redis
+    image: redis:7.4.2
+    restart: always
+    ports:
+      - "${REDIS__PORT}:6379"
+    networks:
+      - app-network
+
+
 networks:
   app-network:
     driver: bridge
