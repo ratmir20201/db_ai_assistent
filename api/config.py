@@ -31,11 +31,23 @@ class ParsingSettings(BaseSettings):
         env_prefix = "PARSE__"
 
 
+class RedisSettings(BaseSettings):
+    """Настройки Redis."""
+
+    host: str = "localhost"
+    port: int = 6379
+    db: int = 0
+
+    class Config:
+        env_prefix = "REDIS__"
+
+
 class Settings(BaseSettings):
     """Общие настройки приложения."""
 
     llm: LLMSettings = LLMSettings()
     parse: ParsingSettings = ParsingSettings()
+    redis: RedisSettings = RedisSettings()
 
 
 settings = Settings()

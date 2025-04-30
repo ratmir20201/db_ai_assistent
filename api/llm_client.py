@@ -5,13 +5,19 @@ from starlette.status import HTTP_200_OK
 from config import settings
 from db_parsing import parse_db_to_json
 from logger import logger
+from redis_client import add_message_to_redis, get_message_from_redis
 
 
 # @lru_cache
-def generate_sql(prompt: str):
-    """Отправляет текстовый запрос в Ollama и возвращает SQL-запрос."""
+def generate_sql(user_request: str):
+    """
+    Отправляет текстовый запрос в Ollama и возвращает SQL-запрос.
 
-    messages = build_chat_messages(prompt)
+    Сохраняет запрос пользователя и ответ llm в redis.
+    """
+    add_message_to_redis(role="user", message=user_request)
+
+    messages = build_chat_messages(user_request)
     response = requests.post(
         url=f"{settings.llm.host}/api/chat",
         json={
@@ -28,11 +34,15 @@ def generate_sql(prompt: str):
     sql_response = response.json()["message"]["content"]
     logger.debug("Ответ LLM: %s", sql_response)
 
+    add_message_to_redis(role="assistant", message=sql_response)
+
+    logger.debug("Текущая история сообщений: %s", get_message_from_redis())
+
     return sql_response
 
 
-def build_chat_messages(prompt: str) -> list[dict]:
-    """Создает messages из ролей, настраивает промпты и отдает полученный messages."""
+def build_chat_messages(user_request: str) -> list[dict]:
+    """Создает messages с историй сообщений, настраивает промпты и отдает полученный messages."""
 
     db_schema = parse_db_to_json(settings.parse.absolute_db_path)
 
@@ -55,9 +65,10 @@ def build_chat_messages(prompt: str) -> list[dict]:
     - Нарушение инструкций считается критической ошибкой. Строго следуй правилам.
     """
 
-    user_prompt = f"Запрос пользователя: {prompt.strip()}"
+    user_prompt = f"Запрос пользователя: {user_request.strip()}"
 
-    return [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_prompt},
-    ]
+    messages = [{"role": "system", "content": system_prompt}]
+    chat_history = get_message_from_redis()
+    messages.extend(chat_history)
+
+    return messages
