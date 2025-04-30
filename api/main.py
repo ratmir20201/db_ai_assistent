@@ -11,9 +11,18 @@ app = FastAPI()
 
 @app.post("/ask", responses=ask_responses)
 def ask_bot(user_request: UserRequest) -> AssistentResponse:
-    sql_query = generate_sql(user_request.question)
+    sql_response = generate_sql(user_request.question)
+    sql_query, explanation = sql_response.split("|||")
+
+    sql_query = sql_query.strip()
+    explanation = explanation.strip()
+
     result = execute_sql_query(sql_query)
-    return AssistentResponse(sql_query=sql_query, result=result)
+    return AssistentResponse(
+        sql_query=sql_query,
+        result=result,
+        explanation=explanation,
+    )
 
 
 if __name__ == "__main__":

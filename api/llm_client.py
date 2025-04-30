@@ -1,14 +1,13 @@
-from functools import lru_cache
-
 import requests
-from config import settings
-from db_parsing import parse_db_to_json
 from fastapi import HTTPException
-from logger import logger
 from starlette.status import HTTP_200_OK
 
+from config import settings
+from db_parsing import parse_db_to_json
+from logger import logger
 
-@lru_cache
+
+# @lru_cache
 def generate_sql(prompt: str):
     """Отправляет текстовый запрос в Ollama и возвращает SQL-запрос."""
 
@@ -29,7 +28,7 @@ def generate_sql(prompt: str):
     sql_response = response.json()["message"]["content"]
     logger.debug("Ответ LLM: %s", sql_response)
 
-    return sql_response.strip()
+    return sql_response
 
 
 def build_chat_messages(prompt: str) -> list[dict]:
@@ -44,14 +43,15 @@ def build_chat_messages(prompt: str) -> list[dict]:
     {db_schema}
 
     Твои правила:
-    - В ответе должен быть только один SQL-запрос и ничего больше. 
+    - В ответе должен быть только один SQL-запрос и объяснение, разделенные символом '|||'.
+    - Если пользователь хочет увидеть все таблицы (например: "Какие есть таблицы", "Покажи все таблицы"), используй: SELECT name FROM sqlite_master WHERE type='table';
     - Если пользователь хочет увидеть содержимое таблицы (например: "Покажи все продукты", "Покажи всех клиентов"), используй: SELECT * FROM 'название таблицы';
     - Если пользователь спрашивает про структуру таблицы (например: "Какие поля есть в таблице", "Что хранит таблица"), используй: PRAGMA table_info('название таблицы');
     - Если пользователь спрашивает про связи между таблицами:
         - Сначала определи, о какой таблице идет речь.
         - Затем используй только один запрос: PRAGMA foreign_key_list('название таблицы');
     - Не придумывай новые таблицы или поля. Используй только те, что есть в структуре базы данных.
-    - Никаких пояснений, комментариев и текста. Только чистый SQL-запрос без форматирования и лишних символов.
+    - Разделяй SQL-запрос и объяснение символом '|||'.
     - Нарушение инструкций считается критической ошибкой. Строго следуй правилам.
     """
 

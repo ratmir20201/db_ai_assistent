@@ -12,3 +12,4 @@ class AssistentResponse(BaseModel):
 
     sql_query: str
     result: list
+    explanation: str
