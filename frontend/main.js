@@ -19,34 +19,36 @@ function sendMessage() {
     chatMessages.append(thinkingMsg);
   }, 1200)
 
-  fetch("http://localhost:8000/ask", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({question: userInput.value})
-  })
-  .then(function(response) {return response.json();})
-  .then(data => {
-    thinkingMsg.remove();
+  setTimeout(function() {
+    fetch("http://localhost:8000/ask", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({question: userInput.value})
+    })
+    .then(function(response) {return response.json();})
+    .then(data => {
+      thinkingMsg.remove();
 
-    const formatted_text = `
-    🧠 Объяснение:
-    ${data.explanation}
+      const formatted_text = `
+      🧠 Объяснение:
+      ${data.explanation}
 
-    💡 SQL-запрос:
-    \`\`\`sql
-    ${data.sql_query}
-    \`\`\`
+      💡 SQL-запрос:
+      \`\`\`sql
+      ${data.sql_query}
+      \`\`\`
 
-    📊 Результат:
-    ${data.result.map(el => el.join(" | ")).join("\n")}
-    `;
+      📊 Результат:
+      ${data.result.map(el => el.join(" | ")).join("\n")}
+      `;
 
-    typeBotResponse(formatted_text);
-  })
-  .catch(error => {
-    thinkingMsg.remove();
-    typeBotResponse("Произошла ошибка: ", error.message)
-  })
+      typeBotResponse(formatted_text);
+    })
+    .catch(error => {
+      thinkingMsg.remove();
+      typeBotResponse("Произошла ошибка: ", error.message)
+    })
+  }, 2000)
 
 }
 

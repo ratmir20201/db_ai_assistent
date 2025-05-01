@@ -1,5 +1,9 @@
+from pathlib import Path
+
 import uvicorn
 from fastapi import FastAPI
+from starlette.responses import FileResponse
+from starlette.staticfiles import StaticFiles
 
 from llm_client import generate_sql
 from responses import ask_responses
@@ -7,6 +11,11 @@ from schemas import AssistentResponse, UserRequest
 from sql_runner import execute_sql_query
 
 app = FastAPI()
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATIC_DIR = BASE_DIR / "frontend"
+
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 @app.post("/ask", responses=ask_responses)
@@ -23,6 +32,11 @@ def ask_bot(user_request: UserRequest) -> AssistentResponse:
         result=result,
         explanation=explanation,
     )
+
+
+@app.get("/")
+def main_title():
+    return FileResponse(STATIC_DIR / "index.html")
 
 
 if __name__ == "__main__":
