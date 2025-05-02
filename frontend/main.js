@@ -9,8 +9,6 @@ function sendMessage() {
   userMsg.innerHTML = userInput.value;
   chatMessages.append(userMsg)
 
-  userInput.value = "";
-
   const thinkingMsg = document.createElement("div");
   thinkingMsg.className = "message bot-message";
   thinkingMsg.innerHTML = "⏳ Думаю...";
@@ -46,8 +44,9 @@ function sendMessage() {
     })
     .catch(error => {
       thinkingMsg.remove();
-      typeBotResponse("Произошла ошибка: ", error.message)
+      typeBotResponse("Произошла ошибка: ", error.detail)
     })
+    userInput.value = "";
   }, 2000)
 
 }

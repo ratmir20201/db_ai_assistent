@@ -1,5 +1,9 @@
+from functools import lru_cache
+
 import requests
 from fastapi import HTTPException
+from requests import Timeout
+from starlette import status
 from starlette.status import HTTP_200_OK
 
 from config import settings
@@ -8,7 +12,7 @@ from logger import logger
 from redis_client import add_message_to_redis, get_message_from_redis
 
 
-# @lru_cache
+@lru_cache
 def generate_sql(user_request: str):
     """
     Отправляет текстовый запрос в Ollama и возвращает SQL-запрос.
@@ -18,16 +22,22 @@ def generate_sql(user_request: str):
     add_message_to_redis(role="user", message=user_request)
 
     messages = build_chat_messages(user_request)
-    response = requests.post(
-        url=f"{settings.llm.host}/api/chat",
-        json={
-            "model": settings.llm.model,
-            "messages": messages,
-            "stream": False,
-            "temperature": 0.2,
-        },
-        timeout=60,
-    )
+    try:
+        response = requests.post(
+            url=f"{settings.llm.host}/api/chat",
+            json={
+                "model": settings.llm.model,
+                "messages": messages,
+                "stream": False,
+                "temperature": 0.2,
+            },
+            timeout=90,
+        )
+    except Timeout:
+        raise HTTPException(
+            status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+            detail="Запрос к LLM превысил лимит времени (timeout)",
+        )
     if response.status_code != HTTP_200_OK:
         raise HTTPException(status_code=response.status_code, detail="Ошибка Ollama")
 
