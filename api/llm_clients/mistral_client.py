@@ -7,7 +7,7 @@ from starlette import status
 from starlette.status import HTTP_200_OK
 
 from config import settings
-from db_parsing import parse_db_to_json
+from db_parsing.sqlite_parse import parse_sqlite_to_json
 from logger import logger
 from redis_client import add_message_to_redis, get_message_from_redis
 
@@ -54,7 +54,7 @@ def generate_sql(user_request: str):
 def build_chat_messages(user_request: str) -> list[dict]:
     """Создает messages с историй сообщений, настраивает промпты и отдает полученный messages."""
 
-    db_schema = parse_db_to_json(settings.parse.absolute_db_path)
+    db_schema = parse_sqlite_to_json(settings.parse.absolute_db_path)
 
     system_prompt = f"""
     Ты — эксперт по SQLite.

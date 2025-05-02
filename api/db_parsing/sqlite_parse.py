@@ -1,7 +1,7 @@
 import sqlite3
 
 
-def parse_db_to_json(db_path: str) -> dict[str, dict[str, list] | list[dict]]:
+def parse_sqlite_to_json(db_path: str) -> dict[str, dict[str, list] | list[dict]]:
     """Парсит бд по указанному пути в json."""
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
