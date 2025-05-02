@@ -6,11 +6,11 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
-from llm_client import generate_sql
+from llm_clients.mistral_client import generate_sql
 from redis_client import redis_client
 from responses import ask_responses
 from schemas import AssistentResponse, UserRequest
-from sql_runner import execute_sql_query
+from sql_executors.sqlite_runner import execute_sql_query
 
 
 async def lifespan(app: FastAPI):

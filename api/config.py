@@ -31,7 +31,7 @@ class ParsingSettings(BaseSettings):
         env_prefix = "PARSE__"
 
 
-class DbSettings(BaseSettings):
+class VerticaSettings(BaseSettings):
     """Настройки базы данных."""
 
     user: str = "user"
@@ -72,6 +72,7 @@ class Settings(BaseSettings):
     llm: LLMSettings = LLMSettings()
     parse: ParsingSettings = ParsingSettings()
     redis: RedisSettings = RedisSettings()
+    vertica: VerticaSettings = VerticaSettings()
 
 
 settings = Settings()
