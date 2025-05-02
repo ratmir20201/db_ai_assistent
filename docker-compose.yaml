@@ -1,42 +1,56 @@
 services:
-  api:
-    build:
-      dockerfile: Dockerfile
-    env_file:
-      - .env
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-    restart: always
+  vertica:
+    image: vertica/vertica-ce
     ports:
-      - "8000:8000"
-    depends_on:
-      - mistral
-    networks:
-      - app-network
-
-  mistral:
-    build:
-      dockerfile: Dockerfile-ollama
-    env_file:
-      - .env
+      - "5433:5433"
     environment:
-      - OLLAMA_HOST=${LLM__HOST}
-      - OLLAMA_MODEL=${LLM__MODEL}
-    ports:
-      - "${LLM__PORT}:11434"
-    restart: always
-    networks:
-      - app-network
-
-  redis:
-    container_name: redis
-    image: redis:7.4.2
-    restart: always
-    ports:
-      - "${REDIS__PORT}:6379"
-    networks:
-      - app-network
+      VERTICA_DB_NAME: db
+      VERTICA_DB_USER: dbadmin
+      VERTICA_DB_PASSWORD: Vertica123
+    volumes:
+      - vertica_data:/data
+    restart: unless-stopped
+#  api:
+#    build:
+#      dockerfile: Dockerfile
+#    env_file:
+#      - .env
+#    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+#    restart: always
+#    ports:
+#      - "8000:8000"
+#    depends_on:
+#      - mistral
+#    networks:
+#      - app-network
+#
+#  mistral:
+#    build:
+#      dockerfile: Dockerfile-ollama
+#    env_file:
+#      - .env
+#    environment:
+#      - OLLAMA_HOST=${LLM__HOST}
+#      - OLLAMA_MODEL=${LLM__MODEL}
+#    ports:
+#      - "${LLM__PORT}:11434"
+#    restart: always
+#    networks:
+#      - app-network
+#
+#  redis:
+#    container_name: redis
+#    image: redis:7.4.2
+#    restart: always
+#    ports:
+#      - "${REDIS__PORT}:6379"
+#    networks:
+#      - app-network
 
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  vertica_data:
