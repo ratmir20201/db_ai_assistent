@@ -7,11 +7,18 @@ from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
 from llm_client import generate_sql
+from redis_client import redis_client
 from responses import ask_responses
 from schemas import AssistentResponse, UserRequest
 from sql_runner import execute_sql_query
 
-app = FastAPI()
+
+async def lifespan(app: FastAPI):
+    redis_client.flushdb()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = BASE_DIR / "frontend"
