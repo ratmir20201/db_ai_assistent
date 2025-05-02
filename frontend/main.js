@@ -27,20 +27,14 @@ function sendMessage() {
     .then(data => {
       thinkingMsg.remove();
 
-      const formatted_text = `
-      🧠 Объяснение:
-      ${data.explanation}
+    const formatted_text = `
+      <div>🧠 Объяснение:<br>${data.explanation}</div><br>
+      <div>💡 SQL-запрос:</div>
+      <pre><code class="language-sql">${data.sql_query}</code></pre><br>
+      <div>📊 Результат:<br>${data.result.map(el => el.join(" | ")).join("<br>")}</div>
+    `;
 
-      💡 SQL-запрос:
-      \`\`\`sql
-      ${data.sql_query}
-      \`\`\`
-
-      📊 Результат:
-      ${data.result.map(el => el.join(" | ")).join("\n")}
-      `;
-
-      typeBotResponse(formatted_text);
+    typeBotResponse(formatted_text);
     })
     .catch(error => {
       thinkingMsg.remove();
@@ -53,15 +47,7 @@ function sendMessage() {
 
 function typeBotResponse(text) {
   const botMsg = document.createElement("div");
-    botMsg.className = "message bot-message";
-    chatMessages.append(botMsg);
-
-    let i = 0;
-    const interval = setInterval(function() {
-      botMsg.innerHTML += text[i];
-      i++;
-      if (i >= text.length) {
-        clearInterval(interval);
-      }
-    }, 30)
+  botMsg.className = "message bot-message";
+  botMsg.innerHTML = text;
+  chatMessages.append(botMsg);
 }
