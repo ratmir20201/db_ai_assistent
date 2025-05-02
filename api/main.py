@@ -6,7 +6,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
-from llm_clients.mistral_client import generate_sql
+from llm_clients.mistral.mistral_client import generate_sql
 from redis_client import redis_client
 from responses import ask_responses
 from schemas import AssistentResponse, UserRequest
@@ -39,7 +39,7 @@ app.add_middleware(
 
 @app.post("/ask", responses=ask_responses)
 def ask_bot(user_request: UserRequest) -> AssistentResponse:
-    sql_response = generate_sql(user_request.question)
+    sql_response = generate_sql(user_request.question, user_request.db_type)
     sql_query, explanation = sql_response.split("|||")
 
     sql_query = sql_query.strip()
