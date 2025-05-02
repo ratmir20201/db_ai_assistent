@@ -1,16 +1,17 @@
 import sqlite3
 
-from config import settings
 from fastapi import HTTPException
-from logger import logger
 from starlette.status import HTTP_400_BAD_REQUEST
 
+from config import settings
+from logger import logger
 
-def execute_sql_query(sql_query: str) -> list:
-    """Проверяет sql-запрос на валидность и исполняет его."""
+
+def execute_sqlite_query(sql_query: str) -> list:
+    """Проверяет sqlite-запрос на валидность и исполняет его."""
 
     with sqlite3.connect(settings.parse.absolute_db_path) as conn:
-        is_validate = validate_sql_query(sql_query, conn)
+        is_validate = validate_sqlite_query(sql_query, conn)
         if not is_validate:
             raise HTTPException(
                 status_code=HTTP_400_BAD_REQUEST,
@@ -31,7 +32,7 @@ def execute_sql_query(sql_query: str) -> list:
         return result
 
 
-def validate_sql_query(sql_query: str, connection: sqlite3.Connection) -> bool:
+def validate_sqlite_query(sql_query: str, connection: sqlite3.Connection) -> bool:
     """Проверяет sql-запрос исполняя его и откатываясь."""
     try:
         cursor = connection.cursor()
@@ -40,5 +41,5 @@ def validate_sql_query(sql_query: str, connection: sqlite3.Connection) -> bool:
         cursor.execute("ROLLBACK TO validate;")
         return True
     except sqlite3.Error as e:
-        logger.error("Ошибка синтаксиса SQL: %s", e)
+        logger.error("Ошибка синтаксиса SQL в sqlite: %s", e)
         return False

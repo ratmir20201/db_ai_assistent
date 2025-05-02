@@ -10,7 +10,7 @@ from llm_clients.mistral.mistral_client import generate_sql
 from redis_client import redis_client
 from responses import ask_responses
 from schemas import AssistentResponse, UserRequest
-from sql_executors.sqlite_runner import execute_sql_query
+from sql_executors.executor import execute_sql
 
 
 async def lifespan(app: FastAPI):
@@ -45,7 +45,7 @@ def ask_bot(user_request: UserRequest) -> AssistentResponse:
     sql_query = sql_query.strip()
     explanation = explanation.strip()
 
-    result = execute_sql_query(sql_query)
+    result = execute_sql(sql_query, user_request.db_type)
     return AssistentResponse(
         sql_query=sql_query,
         result=result,
