@@ -23,7 +23,7 @@ def execute_vertica_query(sql_query: str) -> list:
         result = cursor.fetchall()
 
         if "v_catalog.foreign_keys" in sql_query:
-            tables = [f"{table_info[1]}.{table_info[2]}" for table_info in result]
+            tables = [[table_info[1], table_info[2]] for table_info in result]
             return tables
 
         if "v_catalog.columns" in sql_query:
