@@ -32,7 +32,3 @@ def parse_vertica_to_json():
             schema["tables"][full_table_name] = table_columns
 
         return schema
-
-
-if __name__ == "__main__":
-    parse_vertica_to_json()

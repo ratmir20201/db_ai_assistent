@@ -1,5 +1,6 @@
 from schemas import DBType
 from sql_executors.sqlite_runner import execute_sqlite_query
+from sql_executors.vertica_runner import execute_vertica_query
 
 
 def execute_sql(sql_query: str, db_type: DBType):

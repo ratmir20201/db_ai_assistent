@@ -39,13 +39,15 @@ app.add_middleware(
 
 @app.post("/ask", responses=ask_responses)
 def ask_bot(user_request: UserRequest) -> AssistentResponse:
-    sql_response = generate_sql(user_request.question, user_request.db_type)
-    sql_query, explanation = sql_response.split("|||")
+    sql_query, explanation = generate_sql(
+        user_request.question,
+        user_request.db_type.lower(),
+    )
 
     sql_query = sql_query.strip()
     explanation = explanation.strip()
 
-    result = execute_sql(sql_query, user_request.db_type)
+    result = execute_sql(sql_query, user_request.db_type.lower())
     return AssistentResponse(
         sql_query=sql_query,
         result=result,

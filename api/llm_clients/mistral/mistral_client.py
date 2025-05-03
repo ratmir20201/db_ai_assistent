@@ -7,14 +7,14 @@ from starlette import status
 from starlette.status import HTTP_200_OK
 
 from config import settings
-from llm_clients.mistral.prompts import get_sqlite_prompt
+from llm_clients.mistral.prompts import get_sqlite_prompt, get_vertica_prompt
 from logger import logger
 from redis_client import add_message_to_redis, get_message_from_redis
 from schemas import DBType
 
 
 @lru_cache
-def generate_sql(user_request: str, db_type: DBType):
+def generate_sql(user_request: str, db_type: DBType) -> tuple[str, str]:
     """
     Отправляет текстовый запрос в Ollama и возвращает SQL-запрос.
 
@@ -49,7 +49,12 @@ def generate_sql(user_request: str, db_type: DBType):
 
     logger.debug("Текущая история сообщений: %s", get_message_from_redis())
 
-    return sql_response
+    try:
+        sql_query, explanation = sql_response.split("|||")
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="LLM сгенерировала некорректный ответ.")
+
+    return sql_query, explanation
 
 
 def build_chat_messages(user_request: str, db_type: DBType) -> list[dict]:
@@ -58,7 +63,7 @@ def build_chat_messages(user_request: str, db_type: DBType) -> list[dict]:
     if db_type == DBType.sqlite:
         system_prompt = get_sqlite_prompt()
     elif db_type == DBType.vertica:
-        system_prompt = ""
+        system_prompt = get_vertica_prompt()
     else:
         raise ValueError(f"Неподдерживаемый тип БД: {db_type}")
 

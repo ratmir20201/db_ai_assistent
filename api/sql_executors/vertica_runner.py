@@ -1,3 +1,5 @@
+from itertools import chain
+
 import vertica_python
 from fastapi import HTTPException
 from starlette.status import HTTP_400_BAD_REQUEST
@@ -19,6 +21,14 @@ def execute_vertica_query(sql_query: str) -> list:
         cursor = connection.cursor()
         cursor.execute(sql_query)
         result = cursor.fetchall()
+
+        if "v_catalog.foreign_keys" in sql_query:
+            tables = [f"{table_info[1]}.{table_info[2]}" for table_info in result]
+            return tables
+
+        if "v_catalog.columns" in sql_query:
+            columns = list(chain.from_iterable(result))
+            return columns
 
         return result
 
