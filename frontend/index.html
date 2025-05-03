@@ -15,13 +15,26 @@
             💬 Привет, я твой AI Python помощник по базам данных
           </div>
         </div>
+        <div class="chat__controls">
+          <div class="chat__selectors">
+            <select id="DBSelector" class="chat__select form-select" aria-label="Выбор БД">
+              <option value="" disabled selected>БД</option>
+              <option value="vertica">Vertica</option>
+              <option value="sqlite">SQLite</option>
+            </select>
+
+            <select id="LLMSelector" class="chat__select form-select" aria-label="Выбор LLM">
+              <option value="" disabled selected>LLM</option>
+              <option value="mistral">Mistral</option>
+            </select>
+          </div>
         <div class="chat__content input-group mb-3">
           <input id="userInput" type="text" class="chat__input form-control" placeholder="Введите сообщение...">
           <button onclick="sendMessage()" class="chat__button btn btn-primary" type="submit">Отправить</button>
         </div>
       </div>
+    </div>
   </div>
-
 
 
 

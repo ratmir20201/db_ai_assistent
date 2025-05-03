@@ -16,7 +16,6 @@ body {
   border-radius: 15px;
 }
 
-
 .chat__content {
   margin: 0;
   display: flex;
@@ -24,6 +23,26 @@ body {
   align-items: end;
   border-top: #3A4A5B 1px solid;
   padding: 16px 16px 0 16px;
+}
+
+.chat__controls {
+  display: flex;
+}
+
+.chat__selectors {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chat__select {
+  min-width: 100px;
+  width: auto;
+  padding-right: 25px;
+  background-color: #2A3C4E;
+  color: #E6F1FF;
+  border: 1px solid #3A4A5B;
+  border-radius: 6px;
 }
 
 .chat__input {

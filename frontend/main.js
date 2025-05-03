@@ -1,8 +1,23 @@
 function sendMessage() {
   const chatMessages = document.getElementById("chatMessages");
   const userInput = document.getElementById("userInput");
+  const DBSelector = document.getElementById("DBSelector");
+  const LLMSelector = document.getElementById("LLMSelector");
+
 
   if (!userInput.value.trim()) return;
+  if (DBSelector.value === "") {
+    alert("Пожалуйста, выберите тип базы данных!");
+    return;
+  }
+
+  if (LLMSelector.value === "") {
+    alert("Пожалуйста, выберите тип LLM!");
+    return;
+  }
+
+  console.log(DBSelector.value);
+  console.log(LLMSelector.value);
 
   const userMsg = document.createElement("div");
   userMsg.className = "message user-message";
@@ -21,9 +36,18 @@ function sendMessage() {
     fetch("http://localhost:8000/ask", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({question: userInput.value})
+      body: JSON.stringify({
+        question: userInput.value,
+        db_type: DBSelector.value,
+        llm_type: LLMSelector.value
+      })
     })
-    .then(function(response) {return response.json();})
+    .then(function(response) {
+      if (!response.ok) {
+        return response.json().then(err => Promise.reject(err));
+      }
+      return response.json();
+    })
     .then(data => {
       thinkingMsg.remove();
 
