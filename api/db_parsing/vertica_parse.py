@@ -1,5 +1,4 @@
 import vertica_python
-
 from config import settings
 
 

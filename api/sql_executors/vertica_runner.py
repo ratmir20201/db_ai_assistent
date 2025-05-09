@@ -1,11 +1,10 @@
 from itertools import chain
 
 import vertica_python
-from fastapi import HTTPException
-from starlette.status import HTTP_400_BAD_REQUEST
-
 from config import settings
+from fastapi import HTTPException
 from logger import logger
+from starlette.status import HTTP_400_BAD_REQUEST
 
 
 def execute_vertica_query(sql_query: str) -> list:

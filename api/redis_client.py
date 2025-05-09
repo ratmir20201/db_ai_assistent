@@ -2,7 +2,6 @@ import json
 from typing import Literal
 
 import redis
-
 from config import settings
 from logger import logger
 

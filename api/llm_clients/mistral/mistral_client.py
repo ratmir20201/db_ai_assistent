@@ -1,16 +1,15 @@
 from functools import lru_cache
 
 import requests
-from fastapi import HTTPException
-from requests import Timeout
-from starlette import status
-from starlette.status import HTTP_200_OK
-
 from config import settings
+from fastapi import HTTPException
 from llm_clients.mistral.prompts import get_sqlite_prompt, get_vertica_prompt
 from logger import logger
 from redis_client import add_message_to_redis, get_message_from_redis
+from requests import Timeout
 from schemas import DBType
+from starlette import status
+from starlette.status import HTTP_200_OK
 
 
 @lru_cache

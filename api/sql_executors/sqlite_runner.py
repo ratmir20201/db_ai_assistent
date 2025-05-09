@@ -1,10 +1,9 @@
 import sqlite3
 
-from fastapi import HTTPException
-from starlette.status import HTTP_400_BAD_REQUEST
-
 from config import settings
+from fastapi import HTTPException
 from logger import logger
+from starlette.status import HTTP_400_BAD_REQUEST
 
 
 def execute_sqlite_query(sql_query: str) -> list:
