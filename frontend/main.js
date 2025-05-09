@@ -62,7 +62,10 @@ function sendMessage() {
     })
     .catch(error => {
       thinkingMsg.remove();
-      typeBotResponse("Произошла ошибка: ", error.detail)
+      const errorMessage = error.detail
+        || error.message
+        || 'Неизвестная ошибка';
+      typeBotResponse(`Произошла ошибка: ${errorMessage}`);
     })
     userInput.value = "";
   }, 2000)
