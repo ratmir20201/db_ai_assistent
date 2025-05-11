@@ -24,5 +24,5 @@ class AssistentResponse(BaseModel):
     """Схема ответа."""
 
     sql_query: str
-    result: list
+    result: list[list[str]] | str
     explanation: str

@@ -2,13 +2,14 @@ from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI
-from redis_client import redis_client
-from responses import ask_responses
-from schemas import AssistentResponse, UserRequest
-from services import get_sql_query_result_explanation
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
+
+from redis_client import redis_client
+from responses import ask_responses
+from schemas import AssistentResponse, UserRequest
+from services import get_sql_query_explanation_result
 
 
 async def lifespan(app: FastAPI):
@@ -37,7 +38,7 @@ app.add_middleware(
 
 @app.post("/ask", responses=ask_responses)
 def ask_bot(user_request: UserRequest) -> AssistentResponse:
-    sql_query, explanation, result = get_sql_query_result_explanation(user_request)
+    sql_query, explanation, result = get_sql_query_explanation_result(user_request)
 
     return AssistentResponse(
         sql_query=sql_query,

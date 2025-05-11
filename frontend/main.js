@@ -51,14 +51,19 @@ function sendMessage() {
     .then(data => {
       thinkingMsg.remove();
 
-    const formatted_text = `
-      <div>🧠 Объяснение:<br>${data.explanation}</div><br>
-      <div>💡 SQL-запрос:</div>
-      <pre><code class="language-sql">${data.sql_query}</code></pre><br>
-      <div>📊 Результат:<br>${data.result.map(el => el.join(" | ")).join("<br>")}</div>
-    `;
+      let result = data.result;
+      if (Array.isArray(result)) {
+        result = result.map(el => el.join(" | ")).join("<br>");
+      }
+      const explanation = data.explanation.replace(/\n/g, "<br>");
+      const formatted_text = `
+        <div>🧠 Объяснение:<br>${explanation}</div><br>
+        <div>💡 SQL-запрос:</div>
+        <pre><code class="language-sql">${data.sql_query}</code></pre><br>
+        <div>📊 Результат:<br>${result}</div>
+      `;
 
-    typeBotResponse(formatted_text);
+     typeBotResponse(formatted_text);
     })
     .catch(error => {
       thinkingMsg.remove();

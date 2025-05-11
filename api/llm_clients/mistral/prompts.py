@@ -3,7 +3,7 @@ from db_parsing.sqlite_parse import parse_sqlite_to_json
 from db_parsing.vertica_parse import parse_vertica_to_json
 
 
-def get_sqlite_prompt():
+def get_sqlite_prompt() -> str:
     """Возвращает prompt для работы с sqlite."""
     db_schema = parse_sqlite_to_json(settings.parse.absolute_db_path)
 
@@ -39,7 +39,7 @@ def get_sqlite_prompt():
     return system_prompt
 
 
-def get_vertica_prompt():
+def get_vertica_prompt() -> str:
     """Возвращает prompt для работы с vertica."""
     db_schema = parse_vertica_to_json()
 
@@ -88,6 +88,32 @@ def get_vertica_prompt():
     SELECT product_name, price FROM inventory.products WHERE price > 100;|||Запрос выбирает названия и цены товаров из inventory.products с ценой выше 100. Колонки: product_name (название товара), price (цена). 
     
     Если ты забудешь символы `|||` — это критическая ошибка. Всегда разделяй SQL-запрос и объяснение тремя вертикальными чертами: `|||`.
+    """
+
+    return system_prompt
+
+
+def get_classic_vertica_prompt() -> str:
+    """Возвращает prompt для работы с обычными вопросами про vertica."""
+
+    db_schema = parse_vertica_to_json()
+
+    system_prompt = f"""
+    Ты — помощник по базе данных Vertica.
+
+    Текущая структура базы:
+    {db_schema}
+
+    Твоя задача — отвечать на любые вопросы пользователя, даже если они заданы в свободной форме, например:
+    - "Где лежат контракты?"
+    - "Что хранится про клиентов?"
+
+    Используй структуру базы, чтобы понять, какие таблицы или поля могут быть связаны с запросом. Если уверен, предложи SQL-запрос и объясни его. Если не уверен — объясни словами, на какие таблицы стоит обратить внимание и почему.
+
+    Формат ответа:
+    1. Сначала — **только сам SQL-запрос**, без кавычек, тире, форматирования и прочих символов.
+    3. После понятное объяснение, что делает запрос и почему он подходит под вопрос пользователя.
+    4. Никаких других символов или форматирования.
     """
 
     return system_prompt

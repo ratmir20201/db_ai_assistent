@@ -1,15 +1,20 @@
 from functools import lru_cache
 
 import requests
-from config import settings
 from fastapi import HTTPException
-from llm_clients.mistral.prompts import get_sqlite_prompt, get_vertica_prompt
-from logger import logger
-from redis_client import add_message_to_redis, get_message_from_redis
 from requests import Timeout
-from schemas import DBType
 from starlette import status
 from starlette.status import HTTP_200_OK
+
+from config import settings
+from llm_clients.mistral.prompts import (
+    get_sqlite_prompt,
+    get_vertica_prompt,
+    get_classic_vertica_prompt,
+)
+from logger import logger
+from redis_client import add_message_to_redis, get_message_from_redis
+from schemas import DBType
 
 
 @lru_cache
@@ -51,7 +56,7 @@ def generate_sql(user_request: str, db_type: DBType) -> tuple[str, str]:
     try:
         sql_query, explanation = sql_response.split("|||")
     except ValueError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="LLM сгенерировала некорректный ответ.")
+        return sql_response.strip(), ""
 
     return sql_query, explanation
 
@@ -62,7 +67,7 @@ def build_chat_messages(user_request: str, db_type: DBType) -> list[dict]:
     if db_type == DBType.sqlite:
         system_prompt = get_sqlite_prompt()
     elif db_type == DBType.vertica:
-        system_prompt = get_vertica_prompt()
+        system_prompt = check_get_vertica_semantic(user_request)
     else:
         raise ValueError(f"Неподдерживаемый тип БД: {db_type}")
 
@@ -72,3 +77,16 @@ def build_chat_messages(user_request: str, db_type: DBType) -> list[dict]:
     messages.append({"role": "user", "content": user_request.strip()})
 
     return messages
+
+
+def check_get_vertica_semantic(user_request: str) -> str:
+    # Примитивная эвристика, можно заменить на классификацию или emb-сопоставление
+    is_usual_question = any(
+        word in user_request.lower()
+        for word in ["где", "наход", "лежат", "содержат", "сохраня"]
+    )
+
+    if is_usual_question:
+        return get_classic_vertica_prompt()
+
+    return get_vertica_prompt()
