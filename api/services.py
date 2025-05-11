@@ -15,6 +15,7 @@ def get_sql_query_explanation_result(user_request: UserRequest):
     sql_query = sql_query.strip()
     explanation = explanation.strip()
 
-    result = execute_sql(sql_query, user_request.db_type.lower())
+    # result = execute_sql(sql_query, user_request.db_type.lower())
+    result = ""
 
     return sql_query, explanation, result
