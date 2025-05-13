@@ -1,4 +1,5 @@
-from starlette.status import HTTP_400_BAD_REQUEST, HTTP_422_UNPROCESSABLE_ENTITY
+from starlette.status import (HTTP_400_BAD_REQUEST,
+                              HTTP_422_UNPROCESSABLE_ENTITY)
 
 
 def generate_response(description: str, detail: str):

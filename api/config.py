@@ -11,24 +11,25 @@ current_dir = Path(__file__).resolve().parent
 class LLMSettings(BaseSettings):
     """Настройки LLM."""
 
-    host: str = ""
-    model: str = ""
+    host: str = "http://localhost"
+    port: str = "11434"
+    model: str = "mistral:latest"
 
     class Config:
         env_prefix = "LLM__"
 
 
-class ParsingSettings(BaseSettings):
-    """Настройки для парсинга."""
-
-    db_path: str = ""
-
-    @property
-    def absolute_db_path(self):
-        return current_dir / self.db_path
-
-    class Config:
-        env_prefix = "PARSE__"
+# class ParsingSettings(BaseSettings):
+#     """Настройки для парсинга."""
+#
+#     db_path: str = ""
+#
+#     @property
+#     def absolute_db_path(self):
+#         return current_dir / self.db_path
+#
+#     class Config:
+#         env_prefix = "PARSE__"
 
 
 class VerticaSettings(BaseSettings):
@@ -43,12 +44,11 @@ class VerticaSettings(BaseSettings):
     @property
     def conn_info(self) -> dict:
         return {
-            "host": self.host,
-            "port": self.port,
-            "user": self.user,
-            "password": self.password,
-            "database": self.database,
-            "autocommit": True,
+            "host": "10.7.7.231",
+            "port": 5433,
+            "user": "dbadmin",
+            "password": "dbadmin",
+            "database": "baiterek",
         }
 
     class Config:
@@ -70,7 +70,7 @@ class Settings(BaseSettings):
     """Общие настройки приложения."""
 
     llm: LLMSettings = LLMSettings()
-    parse: ParsingSettings = ParsingSettings()
+    # parse: ParsingSettings = ParsingSettings()
     redis: RedisSettings = RedisSettings()
     vertica: VerticaSettings = VerticaSettings()
 

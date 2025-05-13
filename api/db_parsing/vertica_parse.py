@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import vertica_python
 from config import settings
 
@@ -7,27 +9,53 @@ def parse_vertica_to_json():
         cursor = connection.cursor()
         cursor.execute(
             """
-            SELECT table_schema, table_name
-            FROM v_catalog.tables
-            WHERE table_schema NOT IN ('v_internal', 'v_catalog')
+            SELECT
+              tab.table_schema,
+              tab.table_name,
+              tab_com.COMMENT table_comment,
+              col.column_name,
+              col.data_type,
+              col_com.COMMENT column_comment
+            FROM v_catalog.tables tab
+            JOIN v_catalog.columns col
+              ON tab.table_id = col.table_id
+            LEFT JOIN v_catalog.comments col_com
+              ON tab.table_id = col_com.object_id
+              AND col.column_name = col_com.child_object
+            LEFT JOIN v_catalog.comments tab_com
+              ON tab.table_id = tab_com.object_id
+              AND tab_com.child_object = ''
+            WHERE tab.table_schema IN (/*'SANDBOX',*/ 'DWH', 'STAGE_DO', 'DM')
+            ORDER BY tab.table_schema_id, tab.table_id, col.ordinal_position
             """
         )
-        tables = cursor.fetchall()
-        schema: dict[str, dict | list] = {"tables": {}}
+        rows = cursor.fetchall()
+        # Group data by (schema, table_name)
+        tables = defaultdict(
+            lambda: {"schema": "", "table": "", "table_comment": "", "columns": []}
+        )
 
-        for i_schema, i_table in tables:
-            full_table_name = f"{i_schema}.{i_table}"
-            cursor.execute(
-                f"""
-                SELECT column_name, data_type, is_nullable
-                FROM v_catalog.columns
-                WHERE table_schema = '{i_schema}' AND table_name = '{i_table}'
-                """
+        for row in rows:
+            (
+                schema,
+                table_name,
+                table_comment,
+                column_name,
+                column_type,
+                column_comment,
+            ) = row
+
+            key = (schema, table_name)
+            table_doc = tables[key]
+
+            table_doc["schema"] = schema
+            table_doc["table"] = table_name
+            table_doc["table_comment"] = table_comment
+            table_doc["columns"].append(
+                {"name": column_name, "type": column_type, "comment": column_comment}
             )
-            columns = cursor.fetchall()
-            table_columns = []
-            for column_name, data_type, nullable in columns:
-                table_columns.append(column_name)
-            schema["tables"][full_table_name] = table_columns
 
-        return schema
+        # Convert to list of documents
+        rag_documents = list(tables.values())
+
+        return rag_documents
