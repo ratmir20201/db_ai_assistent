@@ -44,11 +44,11 @@ class VerticaSettings(BaseSettings):
     @property
     def conn_info(self) -> dict:
         return {
-            "host": "10.7.7.231",
-            "port": 5433,
-            "user": "dbadmin",
-            "password": "dbadmin",
-            "database": "baiterek",
+            "host": self.host,
+            "port": self.port,
+            "user": self.user,
+            "password": self.password,
+            "database": self.database,
         }
 
     class Config:
