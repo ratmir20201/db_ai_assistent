@@ -1,6 +1,5 @@
-from llm_clients.mistral.mistral_client import generate_sql
+from llm_clients.mistral.mistral_client_depr import generate_sql
 from schemas import UserRequest
-from sql_executors.executor import execute_sql
 
 
 def get_sql_query_explanation_result(user_request: UserRequest):

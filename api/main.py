@@ -2,13 +2,14 @@ from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI
-from redis_client import redis_client
-from responses import ask_responses
-from schemas import AssistentResponse, UserRequest
-from services import get_sql_query_explanation_result
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
+
+from redis_client_depr import redis_client
+from responses import ask_responses
+from schemas import AssistentResponse, UserRequest
+from services import get_sql_query_explanation_result
 
 
 async def lifespan(app: FastAPI):
