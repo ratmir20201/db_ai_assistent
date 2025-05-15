@@ -1,6 +1,11 @@
 from config import settings
 from db_parsing.sqlite_parse import parse_sqlite_to_json
 from db_parsing.vertica_parse import parse_vertica_to_json
+from schemas import DBType
+
+
+def get_general_prompt(db_type: DBType) -> str:
+    return f"""Ты помощник по базе данных {db_type}. Отвечай на вопросы пользователя, давая понятные пояснения."""
 
 
 def get_sqlite_prompt() -> str:

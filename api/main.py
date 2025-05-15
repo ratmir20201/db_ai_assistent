@@ -38,13 +38,18 @@ app.add_middleware(
 
 @app.post("/ask", responses=ask_responses)
 def ask_bot(user_request: UserRequest) -> AssistentResponse:
-    sql_query, explanation, result = get_sql_query_explanation_result(user_request)
+    response = get_sql_query_explanation_result(user_request)
 
-    return AssistentResponse(
-        sql_query=sql_query,
-        result=result,
-        explanation=explanation,
-    )
+    if isinstance(response, tuple):
+        sql_query, explanation, result = response
+
+        return AssistentResponse(
+            sql_query=sql_query,
+            result=result,
+            explanation=explanation,
+        )
+
+    return AssistentResponse(sql_query="", result="", explanation=response)
 
 
 @app.get("/")
