@@ -12,20 +12,20 @@ from redis_history import history
 from schemas import DBType
 
 
-def generate_sql(user_request: str, db_type: DBType) -> tuple[str, str]:
+def generate_sql(question: str, db_type: DBType) -> tuple[str, str]:
     """
     Отправляет текстовый запрос в Ollama и возвращает SQL-запрос с объяснением.
 
     Сохраняет запрос пользователя и ответ llm в redis.
     """
-    history.add_user_message(user_request)
+    history.add_user_message(question)
 
     llm = Ollama(model=settings.llm.model, temperature=0.2)
-    prompt = build_prompt(user_request, db_type)
+    prompt = build_prompt(question, db_type)
     chain = prompt | llm
-    response = chain.invoke()
+    response = chain.invoke({})
 
-    logger.debug("Запрос пользователя: %s", user_request)
+    logger.debug("Запрос пользователя: %s", question)
     logger.debug("Ответ LLM: %s", response)
 
     history.add_ai_message(response)

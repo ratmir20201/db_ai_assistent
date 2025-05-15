@@ -64,7 +64,7 @@ class RedisSettings(BaseSettings):
 
     @property
     def url(self) -> str:
-        return f"{self.host}:{self.port}/{self.db}"
+        return f"redis://{self.host}:{self.port}/{self.db}"
 
     class Config:
         env_prefix = "REDIS__"

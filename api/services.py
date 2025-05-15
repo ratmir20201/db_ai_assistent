@@ -1,11 +1,11 @@
-from llm_clients.mistral.mistral_client_depr import generate_sql
+from llm_clients.mistral.mistral_client import generate_sql
 from schemas import UserRequest
 
 
 def get_sql_query_explanation_result(user_request: UserRequest):
     sql_query, explanation = generate_sql(
-        user_request.question,
-        user_request.db_type.lower(),
+        question=user_request.question,
+        db_type=user_request.db_type.lower(),
     )
 
     if not explanation:
