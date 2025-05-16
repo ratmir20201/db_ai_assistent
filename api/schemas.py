@@ -18,11 +18,12 @@ class UserRequest(BaseModel):
     question: str
     db_type: DBType
     llm_type: LLMType
+    sql_required: bool = False
 
 
 class AssistentResponse(BaseModel):
     """Схема ответа."""
 
     sql_query: str
-    result: list[list[str]] | str
+    sql_script_result: list[list[str]] | str
     explanation: str

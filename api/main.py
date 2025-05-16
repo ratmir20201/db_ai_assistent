@@ -41,15 +41,15 @@ def ask_bot(user_request: UserRequest) -> AssistentResponse:
     response = get_sql_query_explanation_result(user_request)
 
     if isinstance(response, tuple):
-        sql_query, explanation, result = response
+        sql_query, explanation, sql_script_result = response
 
         return AssistentResponse(
             sql_query=sql_query,
-            result=result,
+            sql_script_result=sql_script_result,
             explanation=explanation,
         )
 
-    return AssistentResponse(sql_query="", result="", explanation=response)
+    return AssistentResponse(sql_query="", sql_script_result="", explanation=response)
 
 
 @app.get("/")
