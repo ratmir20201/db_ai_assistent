@@ -1,45 +1,46 @@
-function sendMessage() {
+document.addEventListener('DOMContentLoaded', function() {
   const chatMessages = document.getElementById("chatMessages");
   const userInput = document.getElementById("userInput");
   const DBSelector = document.getElementById("DBSelector");
   const LLMSelector = document.getElementById("LLMSelector");
+  const sendButton = document.getElementById('sendButton');
+  const sql_required = document.getElementById('sqlSwitcher');
 
 
-  if (!userInput.value.trim()) return;
-  if (DBSelector.value === "") {
-    alert("Пожалуйста, выберите тип базы данных!");
-    return;
-  }
 
-  if (LLMSelector.value === "") {
-    alert("Пожалуйста, выберите тип LLM!");
-    return;
-  }
+  function sendMessage() {
+    if (!userInput.value.trim()) return;
+    if (DBSelector.value === "") {
+      alert("Пожалуйста, выберите тип базы данных!");
+      return;
+    }
 
-  console.log(DBSelector.value);
-  console.log(LLMSelector.value);
+    if (LLMSelector.value === "") {
+      alert("Пожалуйста, выберите тип LLM!");
+      return;
+    }
 
-  const userMsg = document.createElement("div");
-  userMsg.className = "message user-message";
-  userMsg.innerHTML = userInput.value;
-  chatMessages.append(userMsg)
+    const userMsg = document.createElement("div");
+    userMsg.className = "message user-message";
+    userMsg.innerHTML = userInput.value;
+    chatMessages.append(userMsg)
 
-  const thinkingMsg = document.createElement("div");
-  thinkingMsg.className = "message bot-message";
-  thinkingMsg.innerHTML = "⏳ Думаю...";
+    const thinkingMsg = document.createElement("div");
+    thinkingMsg.className = "message bot-message";
+    thinkingMsg.innerHTML = "⏳ Думаю...";
 
-  setTimeout(function() {
-    chatMessages.append(thinkingMsg);
-  }, 1200)
+    setTimeout(function() {
+      chatMessages.append(thinkingMsg);
+    }, 1200)
 
-  setTimeout(function() {
     fetch("http://localhost:8000/ask", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
         question: userInput.value,
         db_type: DBSelector.value,
-        llm_type: LLMSelector.value
+        llm_type: LLMSelector.value,
+        sql_required: sql_required.checked,
       })
     })
     .then(function(response) {
@@ -50,20 +51,27 @@ function sendMessage() {
     })
     .then(data => {
       thinkingMsg.remove();
+      let formatted_text;
+      console.log(sql_required.checked);
 
-      let result = data.result;
-      if (Array.isArray(result)) {
-        result = result.map(el => el.join(" | ")).join("<br>");
-      }
-      const explanation = data.explanation.replace(/\n/g, "<br>");
-      const formatted_text = `
+      if (sql_required.checked) {
+        let result = data.result;
+        if (Array.isArray(result)) {
+          result = result.map(el => el.join(" | ")).join("<br>");
+        }
+        const explanation = data.explanation.replace(/\n/g, "<br>");
+        formatted_text = `
         <div>🧠 Объяснение:<br>${explanation}</div><br>
         <div>💡 SQL-запрос:</div>
         <pre><code class="language-sql">${data.sql_query}</code></pre><br>
         <div>📊 Результат:<br>${result}</div>
-      `;
+        `;
+      }
+      else {
+        formatted_text = data.explanation;
+      }
 
-     typeBotResponse(formatted_text);
+      typeBotResponse(formatted_text);
     })
     .catch(error => {
       thinkingMsg.remove();
@@ -72,14 +80,22 @@ function sendMessage() {
         || 'Неизвестная ошибка';
       typeBotResponse(`Произошла ошибка: ${errorMessage}`);
     })
+
     userInput.value = "";
-  }, 2000)
+  }
 
-}
+  function typeBotResponse(text) {
+    const botMsg = document.createElement("div");
+    botMsg.className = "message bot-message";
+    botMsg.innerHTML = text;
+    chatMessages.append(botMsg);
+  }
 
-function typeBotResponse(text) {
-  const botMsg = document.createElement("div");
-  botMsg.className = "message bot-message";
-  botMsg.innerHTML = text;
-  chatMessages.append(botMsg);
-}
+  sendButton.addEventListener("click", sendMessage);
+  userInput.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
+  });
+
+});
