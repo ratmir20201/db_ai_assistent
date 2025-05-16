@@ -6,7 +6,7 @@ from config import settings
 from llm_clients.mistral.prompts import (
     get_sqlite_prompt,
     get_vertica_prompt,
-    get_general_prompt,
+    get_general_vertica_prompt,
 )
 from logger import logger
 from redis_history import history
@@ -72,7 +72,7 @@ def build_sql_prompt(question: str, db_type: DBType):
 
 
 def build_general_prompt(question: str, db_type: DBType):
-    system_prompt = get_general_prompt(db_type)
+    system_prompt = get_general_vertica_prompt(db_type)
 
     return ChatPromptTemplate.from_messages(
         [("system", system_prompt), ("human", question)]
