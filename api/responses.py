@@ -1,5 +1,7 @@
-from starlette.status import (HTTP_400_BAD_REQUEST,
-                              HTTP_422_UNPROCESSABLE_ENTITY)
+from starlette.status import (
+    HTTP_500_INTERNAL_SERVER_ERROR,
+    HTTP_422_UNPROCESSABLE_ENTITY,
+)
 
 
 def generate_response(description: str, detail: str):
@@ -9,17 +11,39 @@ def generate_response(description: str, detail: str):
     }
 
 
+def generate_responses(description: str, examples: dict[str, dict]):
+    return {
+        "description": description,
+        "content": {"application/json": {"examples": examples}},
+    }
+
+
 incorrect_sql_query = generate_response(
-    description="Некорректный SQL-запрос.",
-    detail="LLM сгенерировала некорректный SQL-запрос.",
+    description="Внутренняя ошибка: некорректный SQL от LLM.",
+    detail="LLM сгенерировала некорректный SQL-запрос. Попробуйте позже.",
 )
 
-data_change_query = generate_response(
-    description="SQL-запрос изменяет данные.",
-    detail="SQL-запрос не должен изменять данные.",
+data_change_query_response = {
+    "summary": "SQL-запрос изменяет данные",
+    "value": {"detail": "SQL-запрос не должен изменять данные."},
+}
+
+invalid_enum_response = {
+    "summary": "Неверный тип db_type или llm_type",
+    "value": {
+        "detail": "Значение не является действительным членом enum; разрешено: 'sqlite', 'vertica'"
+    },
+}
+
+bad_data = generate_responses(
+    description="Ошибка обработки данных.",
+    examples={
+        "data_change": data_change_query_response,
+        "invalid_enum": invalid_enum_response,
+    },
 )
 
 ask_responses = {
-    HTTP_400_BAD_REQUEST: incorrect_sql_query,
-    HTTP_422_UNPROCESSABLE_ENTITY: data_change_query,
+    HTTP_422_UNPROCESSABLE_ENTITY: bad_data,
+    HTTP_500_INTERNAL_SERVER_ERROR: incorrect_sql_query,
 }

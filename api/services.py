@@ -1,4 +1,5 @@
-from llm_clients.mistral.mistral_client import llm_chatting
+from llms.base_llm import BaseLLM
+from llms.llms import get_llm_by_type
 from schemas import UserRequest
 
 
@@ -8,11 +9,14 @@ def get_sql_query_explanation_result(user_request: UserRequest) -> tuple | str:
 
     Либо если sql-запрос не нужен возвращает ответ на вопрос пользователя.
     """
-    llm_response = llm_chatting(
+
+    LLMClass = get_llm_by_type(user_request.llm_type)
+    llm: BaseLLM = LLMClass(
         question=user_request.question,
         db_type=user_request.db_type.lower(),
         sql_required=user_request.sql_required,
     )
+    llm_response = llm.llm_chatting()
 
     if isinstance(llm_response, tuple):
         sql_query, explanation = llm_response

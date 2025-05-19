@@ -1,9 +1,10 @@
 from fastapi import HTTPException
+from starlette.status import HTTP_400_BAD_REQUEST
+
 from logger import logger
 from schemas import DBType
 from sql_executors.sqlite_runner import execute_sqlite_query
 from sql_executors.vertica_runner import execute_vertica_query
-from starlette.status import HTTP_400_BAD_REQUEST
 
 WRITE_COMMANDS = (
     "insert",
@@ -40,6 +41,6 @@ def execute_sql(sql_query: str, db_type: DBType):
         result = execute_vertica_query(sql_query)
     else:
         logger.warning("Пользователь указал несуществующий тип бд: %s", db_type)
-        raise ValueError(f"Неподдерживаемый тип БД: {db_type}")
+        raise TypeError(f"Неподдерживаемый тип БД: {db_type}")
 
     return result

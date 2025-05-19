@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(data => {
       thinkingMsg.remove();
       let formatted_text;
+      const explanation = data.explanation.replace(/\n/g, "<br>");
       console.log(sql_required.checked);
 
       if (sql_required.checked) {
@@ -59,7 +60,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (Array.isArray(result)) {
           result = result.map(el => el.join(" | ")).join("<br>");
         }
-        const explanation = data.explanation.replace(/\n/g, "<br>");
         formatted_text = `
         <div>🧠 Объяснение:<br>${explanation}</div><br>
         <div>💡 SQL-запрос:</div>
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
       }
       else {
-        formatted_text = data.explanation;
+        formatted_text = explanation;
       }
 
       typeBotResponse(formatted_text);
