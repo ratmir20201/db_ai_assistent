@@ -2,7 +2,6 @@ from config import settings
 from db_parsing.sqlite_parse import parse_sqlite_to_json
 from db_parsing.vertica_parse import parse_vertica_to_json
 from llms.base_prompt import BasePrompt
-from logger import logger
 
 
 class MistralVerticaPrompt(BasePrompt):
@@ -12,8 +11,6 @@ class MistralVerticaPrompt(BasePrompt):
         """Возвращает обычный промпт для ответа пользователю основанный на vertica."""
 
         db_schema = parse_vertica_to_json()
-
-        logger.debug(f"db_schema: {db_schema}")
 
         return f"""
         You are an assistant helping users work with a Vertica database.
@@ -45,8 +42,6 @@ class MistralVerticaPrompt(BasePrompt):
     def get_sql_prompt(self) -> str:
         """Возвращает prompt для работы с vertica(sql-запрос c объяснением)."""
         db_schema = parse_vertica_to_json()
-
-        logger.debug(f"db_schema: {db_schema}")
 
         system_prompt = f"""
         You are a Vertica DBMS expert.
