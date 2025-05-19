@@ -1,9 +1,10 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Type
 
 from langchain_core.prompts import ChatPromptTemplate
 
 from llms.base_prompt import BasePrompt
+from logger import logger
 from redis_history import history
 from schemas import DBType
 
@@ -17,11 +18,34 @@ class BaseLLM(ABC):
         self.db_type = db_type
         self.sql_required = sql_required
 
-    @abstractmethod
     def llm_chatting(self) -> tuple[str, str] | str:
-        """Основной метод в котором ведется диалог пользователя с ассистентом."""
+        """
+        Основной метод в котором ведется диалог пользователя с ассистентом.
 
-    def build_sql_prompt(self):
+        Отправляет текстовый запрос в Ollama и возвращает ответ пользователю.
+
+        Если параметр sql_required=True функция вернет SQL-запрос с объяснением,
+        иначе будет возвращен простой ответ на вопрос.
+        Сохраняет запрос пользователя и ответ llm в redis.
+        """
+        logger.debug("Запрос пользователя: %s", self.question)
+
+        history.add_user_message(self.question)
+
+        if not self.sql_required:
+            return self._get_response_to_general_prompt()
+        else:
+            sql_response = self._get_response_to_sql_prompt()
+            try:
+                sql_query, explanation = sql_response.split("|||")
+            except ValueError:
+                logger.warning(
+                    "Ответ LLM не содержит разделителей |||: %s", sql_response
+                )
+                return sql_response
+            return sql_query, explanation
+
+    def _build_sql_prompt(self):
         """Получает и отдает промпт с sql-запросом для llm."""
 
         if self.db_type in self.db_type_prompt_class.keys():
@@ -30,7 +54,7 @@ class BaseLLM(ABC):
 
         raise TypeError(f"Неподдерживаемый тип БД: {self.db_type}")
 
-    def build_basic_prompt(self):
+    def _build_basic_prompt(self):
         """Получает и отдает базовый промпт для llm."""
 
         if self.db_type in self.db_type_prompt_class.keys():
@@ -38,6 +62,26 @@ class BaseLLM(ABC):
             return self._get_chat_prompt_dialog(system_prompt)
 
         raise TypeError(f"Неподдерживаемый тип БД: {self.db_type}")
+
+    def _get_response_to_general_prompt(self) -> str:
+        prompt = self._build_basic_prompt()
+        chain = prompt | self.llm
+        response = chain.invoke({})
+        history.add_ai_message(response)
+
+        logger.debug("Ответ LLM: %s", response)
+
+        return response
+
+    def _get_response_to_sql_prompt(self) -> str:
+        prompt = self._build_sql_prompt()
+        chain = prompt | self.llm
+        response = chain.invoke({})
+        history.add_ai_message(response)
+
+        logger.debug("Ответ LLM c sql-запросом: %s", response)
+
+        return response
 
     def _get_chat_prompt_dialog(self, system_prompt: str):
         """Возвращает историю диалога пользователя с ассистентом."""

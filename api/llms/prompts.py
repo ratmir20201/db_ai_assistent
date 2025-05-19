@@ -4,7 +4,7 @@ from db_parsing.vertica_parse import parse_vertica_to_json
 from llms.base_prompt import BasePrompt
 
 
-class MistralVerticaPrompt(BasePrompt):
+class VerticaPrompt(BasePrompt):
     """Класс с промптами на Vertica."""
 
     def get_basic_prompt(self) -> str:
@@ -91,7 +91,7 @@ class MistralVerticaPrompt(BasePrompt):
         return system_prompt
 
 
-class MistralSQLitePrompt(BasePrompt):
+class SQLitePrompt(BasePrompt):
     """Класс с промптами на SQLite."""
 
     def get_basic_prompt(self) -> str:

@@ -10,6 +10,9 @@ class DBType(str, Enum):
 
 class LLMType(str, Enum):
     mistral = "mistral"
+    deepseek_r1 = "deepseek_r1"
+    deepseek_coder_v1 = "deepseek-coder:1.3b"
+    deepseek_coder_v2 = "deepseek-coder:6.7b"
 
 
 class UserRequest(BaseModel):
