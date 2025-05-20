@@ -3,6 +3,8 @@ from typing import Type
 
 from langchain_core.prompts import ChatPromptTemplate
 
+# from db_parsing.sqlite_parse import parse_sqlite_to_json
+from db_parsing.vertica_parse import parse_vertica_to_json
 from llms.base_prompt import BasePrompt
 from logger import logger
 from redis_history import history
@@ -12,6 +14,10 @@ from schemas import DBType
 class BaseLLM(ABC):
     llm = ...
     db_type_prompt_class: dict[DBType, Type[BasePrompt]] = {}
+    db_type_db_parse: dict[DBType, list | dict] = {
+        # DBType.sqlite: parse_sqlite_to_json(),
+        DBType.vertica: parse_vertica_to_json(),
+    }
 
     def __init__(self, question: str, db_type: DBType, sql_required: bool):
         self.question = question
@@ -66,7 +72,8 @@ class BaseLLM(ABC):
     def _get_response_to_general_prompt(self) -> str:
         prompt = self._build_basic_prompt()
         chain = prompt | self.llm
-        response = chain.invoke({})
+        parsed_db = self.db_type_db_parse[self.db_type]
+        response = chain.invoke({"schema": str(parsed_db)})
         history.add_ai_message(response)
 
         logger.debug("Ответ LLM: %s", response)
@@ -76,7 +83,8 @@ class BaseLLM(ABC):
     def _get_response_to_sql_prompt(self) -> str:
         prompt = self._build_sql_prompt()
         chain = prompt | self.llm
-        response = chain.invoke({})
+        parsed_db = self.db_type_db_parse[self.db_type]
+        response = chain.invoke({"schema": str(parsed_db)})
         history.add_ai_message(response)
 
         logger.debug("Ответ LLM c sql-запросом: %s", response)

@@ -1,6 +1,4 @@
-from config import settings
-from db_parsing.sqlite_parse import parse_sqlite_to_json
-from db_parsing.vertica_parse import parse_vertica_to_json
+# from db_parsing.sqlite_parse import parse_sqlite_to_json
 from llms.base_prompt import BasePrompt
 
 
@@ -10,13 +8,11 @@ class VerticaPrompt(BasePrompt):
     def get_basic_prompt(self) -> str:
         """Возвращает обычный промпт для ответа пользователю основанный на vertica."""
 
-        db_schema = parse_vertica_to_json()
-
-        return f"""
+        return """
         You are an assistant helping users work with a Vertica database.
         
         Current database structure:
-        {db_schema}
+        {schema}
     
         Guidelines for your responses:
         - Answer user questions in natural language (avoid technical jargon when possible)
@@ -41,13 +37,12 @@ class VerticaPrompt(BasePrompt):
 
     def get_sql_prompt(self) -> str:
         """Возвращает prompt для работы с vertica(sql-запрос c объяснением)."""
-        db_schema = parse_vertica_to_json()
 
-        system_prompt = f"""
+        system_prompt = """
         You are a Vertica DBMS expert.
 
         Current database structure:
-        {db_schema}
+        {schema}
 
         Your rules:
         - Answer the user's question with a single SQL query and detailed explanation.
@@ -99,13 +94,12 @@ class SQLitePrompt(BasePrompt):
 
     def get_sql_prompt(self) -> str:
         """Возвращает prompt для работы с sqlite(sql-запрос c объяснением)."""
-        db_schema = parse_sqlite_to_json(settings.parse.absolute_db_path)
 
-        system_prompt = f"""
+        system_prompt = """
         Ты — эксперт по SQLite.
     
         Текущая структура базы данных:
-        {db_schema}
+        {schema}
     
         Твои строгие правила:
     
