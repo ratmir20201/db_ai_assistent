@@ -18,13 +18,16 @@
         <div class="chat__controls">
           <div class="chat__selectors">
             <select id="DBSelector" class="chat__select form-select" aria-label="Выбор БД">
-              <option value="" disabled selected>БД</option>
-              <option value="vertica">Vertica</option>
-              <option value="sqlite">SQLite</option>
+              <option value="" disabled>БД</option>
+              <option value="vertica" selected>Vertica</option>
+<!--              <option value="sqlite">SQLite</option>-->
             </select>
 
             <select id="LLMSelector" class="chat__select form-select" aria-label="Выбор LLM">
-              <option value="" disabled selected>LLM</option>
+              <option value="" disabled >LLM</option>
+              <option value="llama:3.1" selected>Llama:3.1</option>
+              <option value="llama:3.2">Llama:3.2</option>
+              <option value="codellama:7b">Codellama:7b</option>
               <option value="mistral">Mistral</option>
               <option value="deepseek_r1">Deepseek-r1</option>
               <option value="deepseek-coder:1.3b">Deepseek-coder:1.3b</option>

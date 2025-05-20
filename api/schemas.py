@@ -13,6 +13,9 @@ class LLMType(str, Enum):
     deepseek_r1 = "deepseek_r1"
     deepseek_coder_v1 = "deepseek-coder:1.3b"
     deepseek_coder_v2 = "deepseek-coder:6.7b"
+    llama31 = "llama:3.1"
+    llama32 = "llama:3.2"
+    codellama_7b = "codellama:7b"
 
 
 class UserRequest(BaseModel):
