@@ -91,8 +91,11 @@ class BaseLLM(ABC):
 
         return response
 
-    def _get_chat_prompt_dialog(self, system_prompt: str):
+    @staticmethod
+    def _get_chat_prompt_dialog(system_prompt: str):
         """Возвращает историю диалога пользователя с ассистентом."""
+
+        logger.debug("История сообщений: %s", history.messages)
         return ChatPromptTemplate.from_messages(
-            [("system", system_prompt), *history.messages, ("human", self.question)]
+            [("system", system_prompt), *history.messages]
         )

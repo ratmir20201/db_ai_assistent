@@ -6,11 +6,19 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
+from redis_history import history
 from responses import ask_responses
 from schemas import AssistentResponse, UserRequest
 from services import get_sql_query_explanation_result
 
-app = FastAPI()
+
+async def lifespan(app: FastAPI):
+    history.clear()
+
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = BASE_DIR / "frontend"
