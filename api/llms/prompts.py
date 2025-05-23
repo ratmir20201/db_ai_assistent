@@ -25,8 +25,7 @@ class VerticaPrompt(BasePrompt):
         SANDBOX – Sandbox: an isolated environment where analysts, data scientists, and developers can experiment with data without disrupting the core data warehouse architecture.
         
         Database metadata in JSON: {schema}
-        
-        Answer the question: """
+        """
 
         # return """
         # You are an assistant helping users work with a Vertica database.
