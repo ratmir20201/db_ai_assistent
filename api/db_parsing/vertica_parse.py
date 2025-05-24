@@ -1,11 +1,14 @@
+import json
 from collections import defaultdict
+from typing import List
 
 import vertica_python
+from langchain_core.documents import Document
 
 from config import settings
 
 
-def parse_vertica_to_json():
+def parse_vertica_to_documents() -> List[Document]:
     with vertica_python.connect(**settings.vertica.conn_info) as connection:
         cursor = connection.cursor()
         cursor.execute(
@@ -57,6 +60,13 @@ def parse_vertica_to_json():
             )
 
         # Convert to list of documents
-        rag_documents = list(tables.values())
+        # rag_documents = list(tables.values())
 
-        return rag_documents
+        # return rag_documents
+
+        documents = []
+        for table in tables.values():
+            content = json.dumps(table, ensure_ascii=False)
+            documents.append(Document(page_content=content))
+
+        return documents
