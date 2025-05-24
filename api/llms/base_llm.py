@@ -4,8 +4,9 @@ from typing import Type
 from langchain_core.prompts import ChatPromptTemplate
 
 # from db_parsing.sqlite_parse import parse_sqlite_to_json
-from db_parsing.vertica_parse import parse_vertica_to_json
+from db_parsing.vertica_parse import parse_vertica_to_documents
 from llms.base_prompt import BasePrompt
+from llms.embeddings import vectorstore
 from logger import logger
 from redis_history import history
 from schemas import DBType
@@ -16,7 +17,7 @@ class BaseLLM(ABC):
     db_type_prompt_class: dict[DBType, Type[BasePrompt]] = {}
     db_type_db_parse: dict[DBType, list | dict] = {
         # DBType.sqlite: parse_sqlite_to_json(),
-        DBType.vertica: parse_vertica_to_json(),
+        DBType.vertica: parse_vertica_to_documents(),
     }
 
     def __init__(self, question: str, db_type: DBType, sql_required: bool):
@@ -51,7 +52,7 @@ class BaseLLM(ABC):
                 return sql_response
             return sql_query, explanation
 
-    def _build_sql_prompt(self):
+    def _build_sql_prompt(self) -> ChatPromptTemplate:
         """Получает и отдает промпт с sql-запросом для llm."""
 
         if self.db_type in self.db_type_prompt_class.keys():
@@ -60,7 +61,7 @@ class BaseLLM(ABC):
 
         raise TypeError(f"Неподдерживаемый тип БД: {self.db_type}")
 
-    def _build_basic_prompt(self):
+    def _build_basic_prompt(self) -> ChatPromptTemplate:
         """Получает и отдает базовый промпт для llm."""
 
         if self.db_type in self.db_type_prompt_class.keys():
@@ -69,12 +70,20 @@ class BaseLLM(ABC):
 
         raise TypeError(f"Неподдерживаемый тип БД: {self.db_type}")
 
+    def _make_chain(self, prompt: ChatPromptTemplate) -> str:
+        """Создает цепь, и делает запрос в llm передавая неполную схему бд."""
+
+        chain = prompt | self.llm
+        incomplete_schema = vectorstore.similarity_search(self.question, 50)
+        formatted_schema = "\n\n".join(doc.page_content for doc in incomplete_schema)
+        response = chain.invoke({"schema": formatted_schema})
+        history.add_ai_message(response)
+
+        return response
+
     def _get_response_to_general_prompt(self) -> str:
         prompt = self._build_basic_prompt()
-        chain = prompt | self.llm
-        parsed_db = self.db_type_db_parse[self.db_type]
-        response = chain.invoke({"schema": str(parsed_db)})
-        history.add_ai_message(response)
+        response = self._make_chain(prompt)
 
         logger.debug("Ответ LLM: %s", response)
 
@@ -82,17 +91,14 @@ class BaseLLM(ABC):
 
     def _get_response_to_sql_prompt(self) -> str:
         prompt = self._build_sql_prompt()
-        chain = prompt | self.llm
-        parsed_db = self.db_type_db_parse[self.db_type]
-        response = chain.invoke({"schema": str(parsed_db)})
-        history.add_ai_message(response)
+        response = self._make_chain(prompt)
 
         logger.debug("Ответ LLM c sql-запросом: %s", response)
 
         return response
 
     @staticmethod
-    def _get_chat_prompt_dialog(system_prompt: str):
+    def _get_chat_prompt_dialog(system_prompt: str) -> ChatPromptTemplate:
         """Возвращает историю диалога пользователя с ассистентом."""
 
         logger.debug("История сообщений: %s", history.messages)
