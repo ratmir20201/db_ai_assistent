@@ -6,6 +6,13 @@ document.addEventListener('DOMContentLoaded', function() {
   const sendButton = document.getElementById('sendButton');
   const sql_required = document.getElementById('sqlSwitcher');
 
+  if (!sessionStorage.getItem("session_id")) {
+    const sessionId = crypto.randomUUID();
+    sessionStorage.setItem("session_id", sessionId);
+  }
+  const session_id = sessionStorage.getItem("session_id");
+
+  // console.log("session_id", session_id);
 
 
   function sendMessage() {
@@ -28,14 +35,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const thinkingMsg = document.createElement("div");
     thinkingMsg.className = "message bot-message";
     thinkingMsg.innerHTML = "⏳ Думаю...";
-
-    setTimeout(function() {
-      chatMessages.append(thinkingMsg);
-    }, 1200)
+    chatMessages.append(thinkingMsg);
 
     fetch("http://localhost:8000/ask", {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        "X-Session-ID": session_id
+      },
       body: JSON.stringify({
         question: userInput.value,
         db_type: DBSelector.value,

@@ -2,23 +2,16 @@ from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi import Request
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
-from redis_history import history
 from responses import ask_responses
 from schemas import AssistentResponse, UserRequest
 from services import get_sql_query_explanation_result
 
-
-async def lifespan(app: FastAPI):
-    history.clear()
-
-    yield
-
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = BASE_DIR / "frontend"
@@ -38,8 +31,8 @@ app.add_middleware(
 
 
 @app.post("/ask", responses=ask_responses)
-def ask_bot(user_request: UserRequest) -> AssistentResponse:
-    response = get_sql_query_explanation_result(user_request)
+def ask_bot(user_request: UserRequest, request: Request) -> AssistentResponse:
+    response = get_sql_query_explanation_result(user_request, request)
 
     if isinstance(response, tuple):
         sql_query, explanation, sql_script_result = response
