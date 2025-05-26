@@ -201,12 +201,71 @@ body {
   animation: slideUp 0.6s ease-in-out forwards;
 }
 
-.bot-message {
+/* .bot-message {
   background: rgb(55 65 81);
+  align-self: flex-start;
+  margin-bottom: 8px;
+} */
+
+.bot-message {
+  position: relative;
+  align-self: flex-start;
+  background: rgb(55 65 81);
+  margin-right: 40px;
+  padding-bottom: 20px;
   align-self: flex-start;
 }
 
 .user-message {
   background: rgb(79 70 229);
   align-self: flex-end;
+}
+
+
+/* Rate Buttons */
+.rating-buttons {
+  position: absolute;
+  bottom: -10px;
+  left: 10px;
+  display: flex;
+  gap: 6px;
+}
+
+.rate-btn {
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.2s;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.like-btn {
+  background: #e3f7eb;
+  color: #00a86b;
+}
+
+.like-btn:hover {
+  background: #00a86b;
+  color: white;
+}
+
+.dislike-btn {
+  background: #ffebee;
+  color: #ff5252;
+}
+
+.dislike-btn:hover {
+  background: #ff5252;
+  color: white;
+}
+
+.rate-btn:active {
+  transform: scale(0.95);
 }
