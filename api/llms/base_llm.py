@@ -1,6 +1,7 @@
 from abc import ABC
 from typing import Type
 
+from langchain_community.chat_message_histories import RedisChatMessageHistory
 from langchain_core.prompts import ChatPromptTemplate
 
 # from db_parsing.sqlite_parse import parse_sqlite_to_json
@@ -8,7 +9,6 @@ from db_parsing.vertica_parse import parse_vertica_to_documents
 from llms.base_prompt import BasePrompt
 from llms.embeddings import vectorstore
 from logger import logger
-from redis_history import history
 from schemas import DBType
 
 
@@ -20,10 +20,17 @@ class BaseLLM(ABC):
         DBType.vertica: parse_vertica_to_documents(),
     }
 
-    def __init__(self, question: str, db_type: DBType, sql_required: bool):
+    def __init__(
+        self,
+        question: str,
+        db_type: DBType,
+        sql_required: bool,
+        history: RedisChatMessageHistory,
+    ):
         self.question = question
         self.db_type = db_type
         self.sql_required = sql_required
+        self.history = history
 
     def llm_chatting(self) -> tuple[str, str] | str:
         """
@@ -37,7 +44,7 @@ class BaseLLM(ABC):
         """
         logger.debug("Запрос пользователя: %s", self.question)
 
-        history.add_user_message(self.question)
+        self.history.add_user_message(self.question)
 
         if not self.sql_required:
             return self._get_response_to_general_prompt()
@@ -77,7 +84,7 @@ class BaseLLM(ABC):
         incomplete_schema = vectorstore.similarity_search(self.question, 50)
         formatted_schema = "\n\n".join(doc.page_content for doc in incomplete_schema)
         response = chain.invoke({"schema": formatted_schema})
-        history.add_ai_message(response)
+        self.history.add_ai_message(response)
 
         return response
 
@@ -97,11 +104,10 @@ class BaseLLM(ABC):
 
         return response
 
-    @staticmethod
-    def _get_chat_prompt_dialog(system_prompt: str) -> ChatPromptTemplate:
+    def _get_chat_prompt_dialog(self, system_prompt: str) -> ChatPromptTemplate:
         """Возвращает историю диалога пользователя с ассистентом."""
 
-        logger.debug("История сообщений: %s", history.messages)
+        logger.debug("История сообщений: %s", self.history.messages)
         return ChatPromptTemplate.from_messages(
-            [("system", system_prompt), *history.messages]
+            [("system", system_prompt), *self.history.messages]
         )
