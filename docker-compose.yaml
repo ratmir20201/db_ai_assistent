@@ -24,31 +24,57 @@ services:
     depends_on:
       - vertica
       - mistral
+      - postgres
     networks:
       - app-network
 
-  mistral:
-    cpus: 4
-    mem_limit: 8g
-    build:
-      dockerfile: Dockerfile-ollama
+  postgres:
+    container_name: postgres
+    image: postgres:17.2
     env_file:
-      - .env
+      - ../db_ai_assistent_copy/.env
     environment:
-      - OLLAMA_HOST=${LLM__HOST}
-      - OLLAMA_MODEL=${LLM__MODEL}
+      TZ: ${TIMEZONE}
+      POSTGRES_DB: ${DB__NAME}
+      POSTGRES_USER: ${DB__USER}
+      POSTGRES_PASSWORD: ${DB__PASSWORD}
+      log_destination: stderr
+      logging_collector: on
+      log_directory: /var/lib/postgresql/data/log
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d ${DB__NAME} -U ${DB__USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
-      - "${LLM__PORT}:11434"
-    restart: always
+      - "${DB__PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [ gpu ]
+
+#  mistral:
+#    cpus: 4
+#    mem_limit: 8g
+#    build:
+#      dockerfile: Dockerfile-ollama
+#    env_file:
+#      - .env
+#    environment:
+#      - OLLAMA_HOST=${LLM__HOST}
+#      - OLLAMA_MODEL=${LLM__MODEL}
+#    ports:
+#      - "${LLM__PORT}:11434"
+#    restart: always
+#    networks:
+#      - app-network
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              count: 1
+#              capabilities: [ gpu ]
 
   redis:
     image: redis:7.4.2
