@@ -31,6 +31,29 @@ class LLMSettings(BaseSettings):
 #     class Config:
 #         env_prefix = "PARSE__"
 
+class DbSettings(BaseSettings):
+    """Настройки базы данных."""
+
+    user: str = "user"
+    password: str = "password"
+    host: str = "postgres"
+    port: int = 5432
+    name: str = ""
+    echo: bool = False
+
+    @property
+    def db_url(self) -> str:
+        return "postgresql+asyncpg://{user}:{password}@{host}:{port}/{name}".format(
+            user=self.user,
+            password=self.password,
+            host=self.host,
+            port=self.port,
+            name=self.name,
+        )
+
+    class Config:
+        env_prefix = "DB__"
+
 
 class VerticaSettings(BaseSettings):
     """Настройки базы данных."""
@@ -77,6 +100,7 @@ class Settings(BaseSettings):
     # parse: ParsingSettings = ParsingSettings()
     redis: RedisSettings = RedisSettings()
     vertica: VerticaSettings = VerticaSettings()
+    db: DbSettings = DbSettings()
 
 
 settings = Settings()
