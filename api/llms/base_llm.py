@@ -32,7 +32,7 @@ class BaseLLM(ABC):
         self.sql_required = sql_required
         self.history = history
 
-    def llm_chatting(self) -> tuple[str, str] | str:
+    def get_llm_response(self) -> tuple[str, str] | str:
         """
         Основной метод в котором ведется диалог пользователя с ассистентом.
 

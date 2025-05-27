@@ -1,4 +1,5 @@
 from fastapi import Request
+from sqlalchemy.orm import Session
 
 from llms.base_llm import BaseLLM
 from llms.llms import get_llm_by_type
@@ -9,6 +10,7 @@ from schemas import UserRequest
 def get_sql_query_explanation_result(
     user_request: UserRequest,
     request: Request,
+    session: Session,
 ) -> tuple | str:
     """
     Возвращает sql-запрос сгенерированный llm, объяснение и результат его выполнения.
@@ -26,7 +28,7 @@ def get_sql_query_explanation_result(
         sql_required=user_request.sql_required,
         history=history,
     )
-    llm_response = llm.llm_chatting()
+    llm_response = llm.get_llm_response()
 
     if isinstance(llm_response, tuple):
         sql_query, explanation = llm_response
