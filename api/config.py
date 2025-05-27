@@ -31,6 +31,7 @@ class LLMSettings(BaseSettings):
 #     class Config:
 #         env_prefix = "PARSE__"
 
+
 class DbSettings(BaseSettings):
     """Настройки базы данных."""
 
@@ -43,7 +44,7 @@ class DbSettings(BaseSettings):
 
     @property
     def db_url(self) -> str:
-        return "postgresql+asyncpg://{user}:{password}@{host}:{port}/{name}".format(
+        return "postgresql+psycopg://{user}:{password}@{host}:{port}/{name}".format(
             user=self.user,
             password=self.password,
             host=self.host,

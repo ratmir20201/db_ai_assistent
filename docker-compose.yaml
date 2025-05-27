@@ -1,38 +1,38 @@
 services:
-#  vertica:
-#    image: vertica/vertica-ce
-#    ports:
-#      - "${VERTICA__PORT}:5433"
-#    environment:
-#      VERTICA_DB_NAME: ${VERTICA__DATABASE}
-#      VERTICA_DB_USER: ${VERTICA__USER}
-#      VERTICA_DB_PASSWORD: ${VERTICA__PASSWORD}
-#    volumes:
-#      - vertica_data:/opt/vertica/data
-#    networks:
-#      - app-network
-
-  api:
-    build:
-      dockerfile: Dockerfile
-    env_file:
-      - .env
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-    restart: always
+  vertica:
+    image: vertica/vertica-ce
     ports:
-      - "8000:8000"
-    depends_on:
-      - vertica
-      - mistral
-      - postgres
+      - "${VERTICA__PORT}:5433"
+    environment:
+      VERTICA_DB_NAME: ${VERTICA__DATABASE}
+      VERTICA_DB_USER: ${VERTICA__USER}
+      VERTICA_DB_PASSWORD: ${VERTICA__PASSWORD}
+    volumes:
+      - vertica_data:/opt/vertica/data
     networks:
       - app-network
+
+#  api:
+#    build:
+#      dockerfile: Dockerfile
+#    env_file:
+#      - .env
+#    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+#    restart: always
+#    ports:
+#      - "8000:8000"
+#    depends_on:
+#      - vertica
+#      - mistral
+#      - postgres
+#    networks:
+#      - app-network
 
   postgres:
     container_name: postgres
     image: postgres:17.2
     env_file:
-      - ../db_ai_assistent_copy/.env
+      - .env
     environment:
       TZ: ${TIMEZONE}
       POSTGRES_DB: ${DB__NAME}
@@ -91,3 +91,4 @@ networks:
 
 volumes:
   vertica_data:
+  postgres_data:

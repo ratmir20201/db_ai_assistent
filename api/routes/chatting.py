@@ -10,7 +10,7 @@ from responses import ask_responses
 from schemas import UserRequest, AssistentResponse
 from services import get_sql_query_explanation_result
 
-router = APIRouter(prefix="/chat", tags=["chatting"])
+router = APIRouter(prefix="/chat", tags=["Chatting"])
 
 
 @router.post("/ask", responses=ask_responses)
