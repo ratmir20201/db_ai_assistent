@@ -1,9 +1,6 @@
-from fastapi import FastAPI, Depends, APIRouter
+from fastapi import Depends, APIRouter
 from fastapi import Request
 from sqlalchemy.orm import Session
-from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import FileResponse
-from starlette.staticfiles import StaticFiles
 
 from database.db import get_session
 from responses import ask_responses

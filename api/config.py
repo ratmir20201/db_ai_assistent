@@ -7,18 +7,6 @@ load_dotenv()
 
 current_dir = Path(__file__).resolve().parent
 
-
-class LLMSettings(BaseSettings):
-    """Настройки LLM."""
-
-    host: str = "http://localhost"
-    port: str = "11434"
-    model: str = "mistral:latest"
-
-    class Config:
-        env_prefix = "LLM__"
-
-
 # class ParsingSettings(BaseSettings):
 #     """Настройки для парсинга."""
 #
@@ -97,7 +85,6 @@ class RedisSettings(BaseSettings):
 class Settings(BaseSettings):
     """Общие настройки приложения."""
 
-    llm: LLMSettings = LLMSettings()
     # parse: ParsingSettings = ParsingSettings()
     redis: RedisSettings = RedisSettings()
     vertica: VerticaSettings = VerticaSettings()

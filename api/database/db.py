@@ -3,7 +3,7 @@ from typing import Any, Generator
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, Session, sessionmaker
 
-from api.config import settings
+from config import settings
 
 DATABASE_URL = settings.db.db_url
 engine = create_engine(DATABASE_URL, echo=settings.db.echo)
