@@ -33,3 +33,4 @@ class AssistentResponse(BaseModel):
     sql_query: str
     sql_script_result: list[list[str]] | str
     explanation: str
+    message_id: int

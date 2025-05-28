@@ -8,26 +8,21 @@ from starlette.staticfiles import StaticFiles
 from database.db import get_session
 from responses import ask_responses
 from schemas import UserRequest, AssistentResponse
-from services import get_sql_query_explanation_result
+from services import get_sql_query_explanation_result_message_id
 
 router = APIRouter(prefix="/chat", tags=["Chatting"])
 
 
-@router.post("/ask", responses=ask_responses)
+@router.post("/messages", responses=ask_responses)
 def ask_bot(
     user_request: UserRequest,
     request: Request,
     session: Session = Depends(get_session),
 ) -> AssistentResponse:
-    response = get_sql_query_explanation_result(user_request, request, session)
+    response = get_sql_query_explanation_result_message_id(
+        user_request,
+        request,
+        session,
+    )
 
-    if isinstance(response, tuple):
-        sql_query, explanation, sql_script_result = response
-
-        return AssistentResponse(
-            sql_query=sql_query,
-            sql_script_result=sql_script_result,
-            explanation=explanation,
-        )
-
-    return AssistentResponse(sql_query="", sql_script_result="", explanation=response)
+    return AssistentResponse(**response)

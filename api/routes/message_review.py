@@ -10,7 +10,11 @@ router = APIRouter(tags=["Review"])
 
 @router.post("/messages/{message_id}/like")
 def add_like(message_id: int, session: Session = Depends(get_session)):
-    review = session.get(MessageReview, message_id)
+    review = (
+        session.query(MessageReview)
+        .filter(MessageReview.message_id == message_id)
+        .first()
+    )
     if not review:
         raise HTTPException(
             status_code=HTTP_404_NOT_FOUND,
@@ -25,7 +29,11 @@ def add_like(message_id: int, session: Session = Depends(get_session)):
 
 @router.post("/messages/{message_id}/dislike")
 def add_dislike(message_id: int, session: Session = Depends(get_session)):
-    review = session.get(MessageReview, message_id)
+    review = (
+        session.query(MessageReview)
+        .filter(MessageReview.message_id == message_id)
+        .first()
+    )
     if not review:
         raise HTTPException(
             status_code=HTTP_404_NOT_FOUND,

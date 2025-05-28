@@ -197,7 +197,7 @@ body {
   display: inline-block;
   max-width: 80%;
   word-wrap: break-word;
-  margin: 5px 15px;
+  margin: 11px 15px;
   animation: slideUp 0.6s ease-in-out forwards;
 }
 
@@ -211,9 +211,10 @@ body {
   position: relative;
   align-self: flex-start;
   background: rgb(55 65 81);
-  margin-right: 40px;
-  padding-bottom: 20px;
-  align-self: flex-start;
+}
+
+.bot-message-with-review {
+  padding-bottom: 30px;
 }
 
 .user-message {
@@ -264,6 +265,16 @@ body {
 .dislike-btn:hover {
   background: #ff5252;
   color: white;
+}
+
+.like-btn.active svg {
+  fill: #00a86b;
+  background: rgba(0, 168, 107, 0.2);
+}
+
+.dislike-btn.active svg {
+  fill: #ff5252;
+  background: rgba(255, 82, 82, 0.2);
 }
 
 .rate-btn:active {

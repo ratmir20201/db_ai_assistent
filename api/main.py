@@ -1,13 +1,19 @@
 from pathlib import Path
 
 import uvicorn
-from fastapi import FastAPI, Depends
-from fastapi import Request
+from fastapi import FastAPI, Depends, Request
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
 from routes.router import main_router
+
+
+# async def lifespan(app: FastAPI):
+#     Base.metadata.create_all(bind=engine)
+#     yield
+#     Base.metadata.drop_all(bind=engine)
+
 
 app = FastAPI()
 
