@@ -1,15 +1,19 @@
 from pathlib import Path
 
 import uvicorn
-from fastapi import FastAPI
-from fastapi import Request
+from fastapi import FastAPI, Depends, Request
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
-from responses import ask_responses
-from schemas import AssistentResponse, UserRequest
-from services import get_sql_query_explanation_result
+from routes.router import main_router
+
+
+# async def lifespan(app: FastAPI):
+#     Base.metadata.create_all(bind=engine)
+#     yield
+#     Base.metadata.drop_all(bind=engine)
+
 
 app = FastAPI()
 
@@ -30,25 +34,12 @@ app.add_middleware(
 )
 
 
-@app.post("/ask", responses=ask_responses)
-def ask_bot(user_request: UserRequest, request: Request) -> AssistentResponse:
-    response = get_sql_query_explanation_result(user_request, request)
-
-    if isinstance(response, tuple):
-        sql_query, explanation, sql_script_result = response
-
-        return AssistentResponse(
-            sql_query=sql_query,
-            sql_script_result=sql_script_result,
-            explanation=explanation,
-        )
-
-    return AssistentResponse(sql_query="", sql_script_result="", explanation=response)
-
-
 @app.get("/")
 def main_title():
     return FileResponse(STATIC_DIR / "index.html")
+
+
+app.include_router(main_router)
 
 
 if __name__ == "__main__":
