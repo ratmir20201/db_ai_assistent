@@ -33,7 +33,12 @@ def get_sql_query_explanation_result_message_id(
     )
     llm_response = llm.get_llm_response()
 
-    message_id = create_bot_message(session, llm_response)
+    message_id = create_bot_message(
+        session=session,
+        llm_text=llm_response,
+        user_question=user_request.question,
+        translated_user_question=llm.translated_user_question,
+    )
 
     if isinstance(llm_response, tuple):
         sql_query, explanation = llm_response

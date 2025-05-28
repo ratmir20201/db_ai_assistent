@@ -10,6 +10,7 @@ from llms.base_prompt import BasePrompt
 from llms.embeddings import vectorstore
 from logger import logger
 from schemas import DBType
+from translator import Translator
 
 
 class BaseLLM(ABC):
@@ -31,6 +32,8 @@ class BaseLLM(ABC):
         self.db_type = db_type
         self.sql_required = sql_required
         self.history = history
+        self.was_translated: bool = False
+        self.translated_user_question: str | None = None
 
     def get_llm_response(self) -> tuple[str, str] | str:
         """
@@ -44,7 +47,7 @@ class BaseLLM(ABC):
         """
         logger.debug("Запрос пользователя: %s", self.question)
 
-        self.history.add_user_message(self.question)
+        self._add_english_user_message_to_history()
 
         if not self.sql_required:
             return self._get_response_to_general_prompt()
@@ -58,6 +61,16 @@ class BaseLLM(ABC):
                 )
                 return sql_response
             return sql_query, explanation
+
+    def _add_english_user_message_to_history(self):
+        language = Translator.language_detect(self.question)
+        if language == "ru":
+            user_message = Translator.translate_from_russian_into_english(self.question)
+            self.history.add_user_message(user_message)
+            self.was_translated = True
+            self.translated_user_question = user_message
+        else:
+            self.history.add_user_message(self.question)
 
     def _build_sql_prompt(self) -> ChatPromptTemplate:
         """Получает и отдает промпт с sql-запросом для llm."""
@@ -93,6 +106,11 @@ class BaseLLM(ABC):
         response = self._make_chain(prompt)
 
         logger.debug("Ответ LLM: %s", response)
+        if self.was_translated:
+            response_in_user_lang = Translator.translate_from_english_into_russian(
+                response
+            )
+            return response_in_user_lang
 
         return response
 
@@ -101,6 +119,11 @@ class BaseLLM(ABC):
         response = self._make_chain(prompt)
 
         logger.debug("Ответ LLM c sql-запросом: %s", response)
+        if self.was_translated:
+            response_in_user_lang = Translator.translate_from_english_into_russian(
+                response
+            )
+            return response_in_user_lang
 
         return response
 
