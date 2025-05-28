@@ -10,7 +10,3 @@ docs = text_splitter.split_documents(documents=parse_vertica_to_documents())
 local_embeddings = OllamaEmbeddings(model="nomic-embed-text")
 
 vectorstore = Chroma.from_documents(documents=docs, embedding=local_embeddings)
-
-
-if __name__ == "__main__":
-    print(vectorstore.similarity_search("contract", 50))
