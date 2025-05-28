@@ -23,6 +23,7 @@ dependencies = [
     "langchain-chroma (>=0.2.4,<0.3.0)",
     "sqlalchemy (>=2.0.41,<3.0.0)",
     "psycopg[binary] (>=3.2.9,<4.0.0)",
+    "alembic (>=1.16.1,<2.0.0)",
 ]
 
 [tool.poetry]
