@@ -1,4 +1,3 @@
-import json
 from collections import defaultdict
 from typing import List
 
@@ -64,9 +63,33 @@ def parse_vertica_to_documents() -> List[Document]:
 
         # return rag_documents
 
+        # documents = []
+        # for table in tables.values():
+        #     content = json.dumps(table, ensure_ascii=False)
+        #     documents.append(Document(page_content=content))
+        #
+        # return documents
+
         documents = []
         for table in tables.values():
-            content = json.dumps(table, ensure_ascii=False)
-            documents.append(Document(page_content=content))
+            lines = [
+                f"Схема: {table['schema']}",
+                f"Таблица: {table['table']}",
+                (
+                    f"Комментарий: {table['table_comment']}"
+                    if table["table_comment"]
+                    else ""
+                ),
+                "",
+                "Колонки:",
+            ]
+            for column in table["columns"]:
+                line = f"  - {column['name']} ({column['type']})"
+                if column["comment"]:
+                    line += f": {column['comment']}"
+                lines.append(line)
+
+            readable_text = "\n".join(line for line in lines if line.strip())
+            documents.append(Document(page_content=readable_text))
 
         return documents
