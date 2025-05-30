@@ -24,5 +24,5 @@ vectorstore = Chroma.from_documents(documents=docs, embedding=local_embeddings)
 
 if __name__ == "__main__":
     # print(docs)
-    response = vectorstore.similarity_search("where are contracts stored", 10)
+    response = vectorstore.similarity_search("where are clients stored", 5)
     print(response)

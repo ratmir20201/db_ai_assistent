@@ -96,10 +96,10 @@ class BaseLLM(ABC):
         chain = prompt | self.llm
         if self.was_translated:
             incomplete_schema = vectorstore.similarity_search(
-                self.translated_user_question, 10
+                self.translated_user_question, 5
             )
         else:
-            incomplete_schema = vectorstore.similarity_search(self.question, 10)
+            incomplete_schema = vectorstore.similarity_search(self.question, 5)
         formatted_schema = "\n\n".join(doc.page_content for doc in incomplete_schema)
         print(formatted_schema)
         response = chain.invoke({"schema": formatted_schema})

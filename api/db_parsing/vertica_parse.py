@@ -5,6 +5,7 @@ import vertica_python
 from langchain_core.documents import Document
 
 from config import settings
+from utils.check_table import is_backup_table
 
 
 def parse_vertica_to_documents() -> List[Document]:
@@ -50,6 +51,9 @@ def parse_vertica_to_documents() -> List[Document]:
                 column_type,
                 column_comment,
             ) = row
+
+            if is_backup_table(table_name):
+                continue
 
             key = (schema, table_name)
             table_doc = tables[key]
