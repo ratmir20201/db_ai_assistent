@@ -1,3 +1,4 @@
+import json
 from collections import defaultdict
 from typing import List
 
@@ -10,6 +11,8 @@ from config import settings
 def parse_vertica_to_documents() -> List[Document]:
     with vertica_python.connect(**settings.vertica.conn_info) as connection:
         cursor = connection.cursor()
+        # cursor.execute("""select * from dm.dm_clients;""")
+        # print(cursor.fetchall())
         cursor.execute(
             """
             SELECT
@@ -28,7 +31,8 @@ def parse_vertica_to_documents() -> List[Document]:
             LEFT JOIN v_catalog.comments tab_com
               ON tab.table_id = tab_com.object_id
               AND tab_com.child_object = ''
-            WHERE tab.table_schema IN (/*'SANDBOX',*/ 'DWH', 'STAGE_DO', 'DM')
+           -- WHERE tab.table_schema IN (/*'SANDBOX',*/ 'DWH', 'STAGE_DO', 'DM')
+            WHERE tab.table_schema IN (/*'SANDBOX',*/ 'DWH', 'DM')
             ORDER BY tab.table_schema_id, tab.table_id, col.ordinal_position
             """
         )
@@ -60,7 +64,7 @@ def parse_vertica_to_documents() -> List[Document]:
 
         # Convert to list of documents
         # rag_documents = list(tables.values())
-
+        #
         # return rag_documents
 
         # documents = []
@@ -73,10 +77,10 @@ def parse_vertica_to_documents() -> List[Document]:
         documents = []
         for table in tables.values():
             lines = [
-                f"Схема: {table['schema']}",
-                f"Таблица: {table['table']}",
+                f"Schema: {table['schema']}",
+                f"Table: {table['table']}",
                 (
-                    f"Комментарий: {table['table_comment']}"
+                    f"Comments: {table['table_comment']}"
                     if table["table_comment"]
                     else ""
                 ),
@@ -90,6 +94,16 @@ def parse_vertica_to_documents() -> List[Document]:
                 lines.append(line)
 
             readable_text = "\n".join(line for line in lines if line.strip())
-            documents.append(Document(page_content=readable_text))
+            metadata = {
+                "schema": table["schema"],
+                "table_name": table["table"],
+                "table_comment": table["table_comment"],
+            }
+
+            documents.append(Document(page_content=readable_text, metadata=metadata))
 
         return documents
+
+
+if __name__ == "__main__":
+    print(parse_vertica_to_documents())

@@ -24,6 +24,10 @@ dependencies = [
     "sqlalchemy (>=2.0.41,<3.0.0)",
     "psycopg[binary] (>=3.2.9,<4.0.0)",
     "alembic (>=1.16.1,<2.0.0)",
+    "qdrant-client (>=1.14.2,<2.0.0)",
+    "fastembed (>=0.7.0,<0.8.0)",
+    "langchain-qdrant (>=0.2.0,<0.3.0)",
+    "pandas (>=2.2.3,<3.0.0)",
 ]
 
 [tool.poetry]

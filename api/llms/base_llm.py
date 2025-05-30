@@ -94,8 +94,14 @@ class BaseLLM(ABC):
         """Создает цепь, и делает запрос в llm передавая неполную схему бд."""
 
         chain = prompt | self.llm
-        incomplete_schema = vectorstore.similarity_search(self.question, 50)
+        if self.was_translated:
+            incomplete_schema = vectorstore.similarity_search(
+                self.translated_user_question, 10
+            )
+        else:
+            incomplete_schema = vectorstore.similarity_search(self.question, 10)
         formatted_schema = "\n\n".join(doc.page_content for doc in incomplete_schema)
+        print(formatted_schema)
         response = chain.invoke({"schema": formatted_schema})
         self.history.add_ai_message(response)
 
