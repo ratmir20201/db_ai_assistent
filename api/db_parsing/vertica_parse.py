@@ -65,38 +65,42 @@ def parse_vertica_to_documents() -> List[Document]:
                 {"name": column_name, "type": column_type, "comment": column_comment}
             )
 
-    # documents = []
-    # for table in mock_data:
-    #     content = json.dumps(table, ensure_ascii=False)
-    #     documents.append(Document(page_content=content))
-    #
-    # return documents
+        # documents = []
+        # for table in mock_data:
+        #     content = json.dumps(table, ensure_ascii=False)
+        #     documents.append(Document(page_content=content))
+        #
+        # return documents
 
-    documents = []
-    for table in tables.values():
-        lines = [
-            f"Schema: {table['schema']}",
-            f"Table: {table['table']}",
-            (f"Comments: {table['table_comment']}" if table["table_comment"] else ""),
-            "",
-            "Колонки:",
-        ]
-        for column in table["columns"]:
-            line = f"  - {column['name']} ({column['type']})"
-            if column["comment"]:
-                line += f": {column['comment']}"
-            lines.append(line)
+        documents = []
+        for table in tables.values():
+            lines = [
+                f"Schema: {table['schema']}",
+                f"Table: {table['table']}",
+                (
+                    f"Comments: {table['table_comment']}"
+                    if table["table_comment"]
+                    else ""
+                ),
+                "",
+                "Колонки:",
+            ]
+            for column in table["columns"]:
+                line = f"  - {column['name']} ({column['type']})"
+                if column["comment"]:
+                    line += f": {column['comment']}"
+                lines.append(line)
 
-        readable_text = "\n".join(line for line in lines if line.strip())
-        metadata = {
-            "schema": table["schema"],
-            "table_name": table["table"],
-            "table_comment": table["table_comment"],
-        }
+            readable_text = "\n".join(line for line in lines if line.strip())
+            metadata = {
+                "schema": table["schema"],
+                "table_name": table["table"],
+                "table_comment": table["table_comment"],
+            }
 
-        documents.append(Document(page_content=readable_text, metadata=metadata))
+            documents.append(Document(page_content=readable_text, metadata=metadata))
 
-    return documents
+        return documents
 
 
 if __name__ == "__main__":

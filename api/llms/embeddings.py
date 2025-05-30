@@ -6,7 +6,7 @@ from qdrant_client import QdrantClient
 
 from db_parsing.vertica_parse import parse_vertica_to_documents
 
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=400, chunk_overlap=60)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=200)
 docs = text_splitter.split_documents(documents=parse_vertica_to_documents())
 
 local_embeddings = OllamaEmbeddings(model="nomic-embed-text")
@@ -24,5 +24,6 @@ vectorstore = Chroma.from_documents(documents=docs, embedding=local_embeddings)
 
 if __name__ == "__main__":
     # print(docs)
-    response = vectorstore.similarity_search("where are clients stored", 5)
+
+    response = vectorstore.similarity_search("where are contracts stored", 10)
     print(response)
