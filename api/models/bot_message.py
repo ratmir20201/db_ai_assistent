@@ -1,4 +1,6 @@
-from sqlalchemy import UniqueConstraint
+import datetime
+
+from sqlalchemy import UniqueConstraint, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.base import Base
@@ -14,6 +16,9 @@ class BotMessage(Base, IdIntPkMixin):
         back_populates="message",
         uselist=False,
         cascade="all, delete-orphan",
+    )
+    timestamp: Mapped[datetime.datetime] = mapped_column(
+        server_default=text("TIMEZONE('UTC', now())")
     )
 
     __table_args__ = (
