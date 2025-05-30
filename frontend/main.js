@@ -6,9 +6,16 @@ document.addEventListener('DOMContentLoaded', function() {
   const sendButton = document.getElementById('sendButton');
   const sql_required = document.getElementById('sqlSwitcher');
 
+  function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+  }
   if (!sessionStorage.getItem("session_id")) {
-    const sessionId = crypto.randomUUID();
-    sessionStorage.setItem("session_id", sessionId);
+    const session_id = generateUUID();
+    sessionStorage.setItem("session_id", session_id);
   }
   const session_id = sessionStorage.getItem("session_id");
 
@@ -40,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500)
 
 
-    fetch("http://localhost:8000/api/chat/messages", {
+    fetch("http://192.168.99.140:8000/api/chat/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -137,11 +144,12 @@ document.addEventListener('DOMContentLoaded', function() {
         likeBtn.classList.remove("active");
       }
 
-      const url = `http://localhost:8000/api/messages/${messageId}/${type}`
+      const url = `http://192.168.99.140:8000/api/messages/${messageId}/${type}`
       await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "accept": "application/json",
           "X-Session-ID": session_id
         },
       })
