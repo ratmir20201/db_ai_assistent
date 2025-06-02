@@ -11,8 +11,6 @@ from utils.check_table import is_backup_table
 def parse_vertica_to_documents() -> List[Document]:
     with vertica_python.connect(**settings.vertica.conn_info) as connection:
         cursor = connection.cursor()
-        # cursor.execute("""select * from dm.dm_clients;""")
-        # print(cursor.fetchall())
         cursor.execute(
             """
             SELECT
@@ -38,9 +36,10 @@ def parse_vertica_to_documents() -> List[Document]:
         )
         rows = cursor.fetchall()
         # Group data by (schema, table_name)
-        tables = defaultdict(
-            lambda: {"schema": "", "table": "", "table_comment": "", "columns": []}
-        )
+        # tables = defaultdict(
+        #     lambda: {"schema": "", "table": "", "table_comment": "", "columns": []}
+        # )
+        documents = []
 
         for row in rows:
             (
@@ -55,52 +54,63 @@ def parse_vertica_to_documents() -> List[Document]:
             if is_backup_table(table_name):
                 continue
 
-            key = (schema, table_name)
-            table_doc = tables[key]
-
-            table_doc["schema"] = schema
-            table_doc["table"] = table_name
-            table_doc["table_comment"] = table_comment
-            table_doc["columns"].append(
-                {"name": column_name, "type": column_type, "comment": column_comment}
+            text = " ".join(str(item) for item in row)
+            documents.append(
+                Document(
+                    page_content=text,
+                    metadata={
+                        "schema": schema,
+                        "table_name": table_name,
+                        "table_comment": table_comment,
+                    },
+                )
             )
 
-        # documents = []
-        # for table in mock_data:
+        return documents
+
+        # key = (schema, table_name)
+        # table_doc = tables[key]
+
+        # table_doc["schema"] = schema
+        # table_doc["table"] = table_name
+        # table_doc["table_comment"] = table_comment
+        # table_doc["columns"].append(
+        #     {"name": column_name, "type": column_type, "comment": column_comment}
+        # )
+
+        # for table in tables.values():
         #     content = json.dumps(table, ensure_ascii=False)
         #     documents.append(Document(page_content=content))
         #
         # return documents
 
-        documents = []
-        for table in tables.values():
-            lines = [
-                f"Schema: {table['schema']}",
-                f"Table: {table['table']}",
-                (
-                    f"Comments: {table['table_comment']}"
-                    if table["table_comment"]
-                    else ""
-                ),
-                "",
-                "Колонки:",
-            ]
-            for column in table["columns"]:
-                line = f"  - {column['name']} ({column['type']})"
-                if column["comment"]:
-                    line += f": {column['comment']}"
-                lines.append(line)
-
-            readable_text = "\n".join(line for line in lines if line.strip())
-            metadata = {
-                "schema": table["schema"],
-                "table_name": table["table"],
-                "table_comment": table["table_comment"],
-            }
-
-            documents.append(Document(page_content=readable_text, metadata=metadata))
-
-        return documents
+        # for table in tables.values():
+        #     lines = [
+        #         f"Schema: {table['schema']}",
+        #         f"Table: {table['table']}",
+        #         (
+        #             f"Comments: {table['table_comment']}"
+        #             if table["table_comment"]
+        #             else ""
+        #         ),
+        #         "",
+        #         "Columns:",
+        #     ]
+        #     for column in table["columns"]:
+        #         line = f"  - {column['name']} ({column['type']})"
+        #         if column["comment"]:
+        #             line += f": {column['comment']}"
+        #         lines.append(line)
+        #
+        #     readable_text = "\n".join(line for line in lines if line.strip())
+        #     metadata = {
+        #         "schema": table["schema"],
+        #         "table_name": table["table"],
+        #         "table_comment": table["table_comment"],
+        #     }
+        #
+        #     documents.append(Document(page_content=readable_text, metadata=metadata))
+        #
 
 
 if __name__ == "__main__":

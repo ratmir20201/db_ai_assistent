@@ -15,7 +15,7 @@ from schemas import DBType
 from translator import Translator
 
 
-def _format_table_schema(docs: List[Document]) -> str:
+def format_table_schema(docs: List[Document]) -> str:
     return "\n\n".join(doc.page_content for doc in docs)
 
 
@@ -99,14 +99,14 @@ class BaseLLM(ABC):
     def _make_chain(self, prompt: ChatPromptTemplate) -> str:
         """Создает цепь, и делает запрос в llm передавая неполную схему бд."""
 
-        chain = {"schema": _format_table_schema} | prompt | self.llm | StrOutputParser()
+        chain = {"schema": format_table_schema} | prompt | self.llm | StrOutputParser()
         if self.was_translated:
             incomplete_schema = vectorstore.similarity_search(
                 self.translated_user_question, 50
             )
         else:
             incomplete_schema = vectorstore.similarity_search(self.question, 50)
-        response = chain.invoke({"schema": incomplete_schema})
+        response = chain.invoke(incomplete_schema)
         self.history.add_ai_message(response)
 
         return response

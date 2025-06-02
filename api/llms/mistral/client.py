@@ -1,3 +1,4 @@
+from langchain_ollama import ChatOllama
 from langchain_ollama import OllamaLLM
 
 from llms.base_llm import BaseLLM
@@ -11,7 +12,7 @@ from schemas import DBType
 class MistralLLM(BaseLLM):
     """Класс для работы с mistral."""
 
-    llm = OllamaLLM(model="mistral:latest", temperature=0.2)
+    llm = ChatOllama(model="mistral:latest", temperature=0.2)
     db_type_prompt_class = {
         DBType.vertica: VerticaPrompt(),
         DBType.sqlite: SQLitePrompt(),
