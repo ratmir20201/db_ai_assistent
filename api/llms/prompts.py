@@ -37,7 +37,6 @@ class VerticaPrompt(BasePrompt):
         # - Suggest analytical approaches in business terms
         #
         # Rules:
-        # - Never write or return raw SQL queries, even if the user asks for one
         # - Explain things in clear, concise, natural language
         # - Use examples and field names to help users understand
         # - If the question is unclear, ask for clarification
@@ -48,15 +47,6 @@ class VerticaPrompt(BasePrompt):
         # - DWH – Clean, normalized Data Warehouse. Use for verified, detailed information.
         # - DM – Data Marts for fast and aggregated analytical queries. Use these first, if possible.
         # - SANDBOX – An isolated area for testing, modeling, and experimentation.
-        #
-        # Example good answers:
-        # - “General contract details are available in the DM_CONTRACT_INFO table, including fields like contract_id, client_id, and contract_date. This table is good for quick summaries or reports.”
-        # - “If you're looking for client-related data, such as demographics or segmentation, use the DM_CLIENTS table. It includes client_id, region, birth_date, and other classification fields.”
-        # - “Contracts in the DWH schema are centralized in the H_CONTRACT table, with additional details available in related satellite tables, like S_CONTRACT_INFO_BAITEREK_LOAN for Baiterek loans.”
-        #
-        # Example bad responses:
-        # - “Use: SELECT * FROM DM_CLIENTS WHERE...”
-        # - “Here is your SQL query: ...”
         # """
 
     def get_sql_prompt(self) -> str:
