@@ -1,7 +1,9 @@
 from abc import ABC
-from typing import Type
+from typing import Type, List
 
 from langchain_community.chat_message_histories import RedisChatMessageHistory
+from langchain_core.documents import Document
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
 # from db_parsing.sqlite_parse import parse_sqlite_to_json
@@ -11,6 +13,10 @@ from llms.embeddings import vectorstore
 from logger import logger
 from schemas import DBType
 from translator import Translator
+
+
+def _format_table_schema(docs: List[Document]) -> str:
+    return "\n\n".join(doc.page_content for doc in docs)
 
 
 class BaseLLM(ABC):
@@ -93,15 +99,14 @@ class BaseLLM(ABC):
     def _make_chain(self, prompt: ChatPromptTemplate) -> str:
         """Создает цепь, и делает запрос в llm передавая неполную схему бд."""
 
-        chain = prompt | self.llm
+        chain = {"schema": _format_table_schema} | prompt | self.llm | StrOutputParser()
         if self.was_translated:
             incomplete_schema = vectorstore.similarity_search(
-                self.translated_user_question, 10
+                self.translated_user_question, 50
             )
         else:
-            incomplete_schema = vectorstore.similarity_search(self.question, 10)
-        formatted_schema = "\n\n".join(doc.page_content for doc in incomplete_schema)
-        response = chain.invoke({"schema": formatted_schema})
+            incomplete_schema = vectorstore.similarity_search(self.question, 50)
+        response = chain.invoke({"schema": incomplete_schema})
         self.history.add_ai_message(response)
 
         return response
