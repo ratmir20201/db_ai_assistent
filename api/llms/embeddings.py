@@ -1,7 +1,7 @@
 from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
 
-from db_parsing.vertica_parse_v2 import parse_vertica_to_documents
+from db_parsing.vertica_parse import parse_vertica_to_documents
 
 # text_splitter = RecursiveCharacterTextSplitter(chunk_size=1100, chunk_overlap=100)
 # text_splitter = CharacterTextSplitter(
@@ -10,7 +10,7 @@ from db_parsing.vertica_parse_v2 import parse_vertica_to_documents
 #     separator="\n",
 # )
 # docs = text_splitter.split_documents(documents=parse_vertica_to_documents())
-docs = parse_vertica_to_documents(10)
+docs = parse_vertica_to_documents()
 
 local_embeddings = OllamaEmbeddings(model="nomic-embed-text")
 

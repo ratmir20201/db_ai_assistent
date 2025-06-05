@@ -47,6 +47,7 @@ class UserCreate(schemas.BaseUserCreate):
     """Схема для создания пользователя."""
 
     username: str
+    password: str
 
 
 class UserUpdate(schemas.BaseUserUpdate):

@@ -54,11 +54,11 @@ async def create_superuser(
         is_verified=is_verified,
     )
 
-    return await add_superuser_to_db(user_create=user_create)
+    return await add_user_to_db(user_create=user_create)
 
 
-async def add_superuser_to_db(user_create: UserCreate) -> User:
-    """Добавляет суперпользователя в бд."""
+async def add_user_to_db(user_create: UserCreate) -> User:
+    """Добавляет пользователя в бд."""
     async with get_async_context_session() as session:
         async with get_user_db_context(session) as user_db:
             async with get_user_manager_context(user_db) as user_manager:

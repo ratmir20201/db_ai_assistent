@@ -5,8 +5,8 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     const email = form.username.value;
     const password = form.password.value;
 
-    // const response = await fetch("http://localhost:8000/auth/login", {
-    const response = await fetch("http://192.168.99.140:8000/auth/login", {
+    const response = await fetch("http://localhost:8000/auth/login", {
+    // const response = await fetch("http://192.168.99.140:8000/auth/login", {
       method: "POST",
       credentials: "include",
       headers: {

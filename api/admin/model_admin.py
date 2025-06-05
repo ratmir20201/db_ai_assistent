@@ -5,9 +5,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from wtforms import PasswordField
 
+from admin.user_creation import add_user_to_db
 from database.db import get_async_context_session
 from models.access_token import AccessToken
 from models.user import User
+from schemas import UserCreate
 
 password_helper = PasswordHelper()
 
@@ -44,17 +46,19 @@ class AdminModelView(ModelView):
 
 
 class UserAdmin(AdminModelView, model=User):
-    column_list = [User.id, User.username]
-    form_excluded_columns = [User.hashed_password]
+    form_extra_fields = {
+        "password": PasswordField("Password"),
+    }
+    # form_columns = ["email", "username", "password", "is_superuser"]
 
-    form_extra_fields = {"password": PasswordField("Password")}
+    async def on_model_change(self, form, model, is_created):
+        user_create = UserCreate(
+            email=form.email.data,
+            username=form.username.data,
+            password=form.password.data,
+        )
+        user = await add_user_to_db(user_create)
+        model.id = user.id
+        model.hashed_password = user.hashed_password
 
-    async def on_model_change(self, data: dict, model: User, is_created: bool) -> None:
-        # Хешируем пароль при создании/изменении
-        if "password" in data and data["password"]:
-            if len(data["password"]) < 6:
-                raise HTTPException(400, detail="Пароль слишком короткий")
-            data["hashed_password"] = password_helper.hash(data["password"])
-            del data["password"]
-
-        await super().on_model_change(data, model, is_created)
+        return await super().on_model_change(form, model, is_created)
