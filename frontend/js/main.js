@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     }, 500)
 
 
-    // fetch("http://192.168.99.140:8000/api/chat/messages", {
-    fetch("http://localhost:8000/api/chat/messages", {
+    fetch("http://192.168.99.140:8000/api/chat/messages", {
+    // fetch("http://localhost:8000/api/chat/messages", {
       method: "POST",
       credentials: "include",
       headers: {
@@ -131,8 +131,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     let currentRating = null;
 
     async function sendRatingRequest(type) {
-      const url = `http://localhost:8000/api/messages/${messageId}/${type}`;
-    // const url = `http://192.168.99.140:8000/api/messages/${messageId}/${type}`
+      // const url = `http://localhost:8000/api/messages/${messageId}/${type}`;
+      const url = `http://192.168.99.140:8000/api/messages/${messageId}/${type}`
 
       const response = await fetch(url, {
         method: "POST",

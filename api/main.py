@@ -1,8 +1,7 @@
 from pathlib import Path
 
 import uvicorn
-from fastapi import FastAPI, Depends, Request, HTTPException
-from fastapi.responses import RedirectResponse
+from fastapi import FastAPI, Depends, HTTPException
 from sqladmin import Admin
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse

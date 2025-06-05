@@ -1,11 +1,15 @@
-from fastapi import Request, Depends, HTTPException
+from fastapi import Request, HTTPException
+from fastapi_users.password import PasswordHelper
 from sqladmin import ModelView
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from wtforms import PasswordField
 
 from database.db import get_async_context_session
 from models.access_token import AccessToken
 from models.user import User
+
+password_helper = PasswordHelper()
 
 
 async def get_user_by_token(token: str, session: AsyncSession) -> User | None:
@@ -41,3 +45,16 @@ class AdminModelView(ModelView):
 
 class UserAdmin(AdminModelView, model=User):
     column_list = [User.id, User.username]
+    form_excluded_columns = [User.hashed_password]
+
+    form_extra_fields = {"password": PasswordField("Password")}
+
+    async def on_model_change(self, data: dict, model: User, is_created: bool) -> None:
+        # Хешируем пароль при создании/изменении
+        if "password" in data and data["password"]:
+            if len(data["password"]) < 6:
+                raise HTTPException(400, detail="Пароль слишком короткий")
+            data["hashed_password"] = password_helper.hash(data["password"])
+            del data["password"]
+
+        await super().on_model_change(data, model, is_created)
