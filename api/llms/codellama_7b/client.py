@@ -12,7 +12,7 @@ from schemas import DBType
 class Codellama7bLLM(BaseLLM):
     """Класс для работы с codellama:7b."""
 
-    llm = ChatOllama(model="codellama:7b", temperature=0.2)
+    llm = ChatOllama(model="codellama:7b", temperature=0.1, num_ctx=8192)
     db_type_prompt_class = {
         DBType.vertica: VerticaPrompt(),
         DBType.sqlite: SQLitePrompt(),

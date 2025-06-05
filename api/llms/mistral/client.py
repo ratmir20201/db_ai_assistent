@@ -12,7 +12,7 @@ from schemas import DBType
 class MistralLLM(BaseLLM):
     """Класс для работы с mistral."""
 
-    llm = ChatOllama(model="mistral:latest", temperature=0.2)
+    llm = ChatOllama(model="mistral:latest", temperature=0.1, num_ctx=8192)
     db_type_prompt_class = {
         DBType.vertica: VerticaPrompt(),
         DBType.sqlite: SQLitePrompt(),

@@ -9,8 +9,8 @@ from db_parsing.vertica_parse import parse_vertica_to_documents
 
 # text_splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=200)
 text_splitter = CharacterTextSplitter(
-    chunk_size=1000,
-    chunk_overlap=30,
+    chunk_size=1100,
+    chunk_overlap=100,
     separator="\n",
 )
 docs = text_splitter.split_documents(documents=parse_vertica_to_documents())
@@ -23,5 +23,8 @@ vectorstore = Chroma.from_documents(documents=docs, embedding=local_embeddings)
 if __name__ == "__main__":
     # print(docs)
 
-    response = vectorstore.similarity_search("Where are the contracts?", 10)
+    response = vectorstore.similarity_search(
+        "Which field in L_DIRECT_REPO_CP can be used as a connection condition with H_LEGAL_ENTITY",
+        50,
+    )
     print(response)
