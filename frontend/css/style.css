@@ -280,3 +280,11 @@ body {
 .rate-btn:active {
   transform: scale(0.95);
 }
+
+.exitButton {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  z-index: 1000;
+}
+

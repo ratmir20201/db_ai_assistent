@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
   const chatMessages = document.getElementById("chatMessages");
   const userInput = document.getElementById("userInput");
   const DBSelector = document.getElementById("DBSelector");
@@ -6,11 +6,29 @@ document.addEventListener('DOMContentLoaded', function() {
   const sendButton = document.getElementById('sendButton');
   const sql_required = document.getElementById('sqlSwitcher');
 
+  // const response = await fetch("http://192.168.99.140:8000/auth/current-user", {
+  //   method: "GET",
+  //   credentials: "include",
+  // });
+  //
+  // console.log(response, response.ok);
+  //
+  // if (!response.ok) {
+  //   window.location.href = "/login";
+  //   return;
+  // }
+  //
+  // const data = await response.json();
+  // if (!data || !data.username) {
+  //   window.location.href = "/login";
+  //   return;
+  // }
+
   function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        const r = Math.random() * 16 | 0;
-        const v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
     });
   }
   if (!sessionStorage.getItem("session_id")) {
@@ -18,8 +36,6 @@ document.addEventListener('DOMContentLoaded', function() {
     sessionStorage.setItem("session_id", session_id);
   }
   const session_id = sessionStorage.getItem("session_id");
-
-  // console.log("session_id", session_id);
 
 
   function sendMessage() {
@@ -49,9 +65,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     fetch("http://192.168.99.140:8000/api/chat/messages", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        "X-Session-ID": session_id
+        "X-Session-ID": session_id,
       },
       body: JSON.stringify({
         question: userInput.value,
@@ -147,6 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const url = `http://192.168.99.140:8000/api/messages/${messageId}/${type}`
       await fetch(url, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
           "accept": "application/json",

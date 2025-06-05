@@ -28,6 +28,11 @@ dependencies = [
     "fastembed (>=0.7.0,<0.8.0)",
     "langchain-qdrant (>=0.2.0,<0.3.0)",
     "pandas (>=2.2.3,<3.0.0)",
+    "fastapi-users[sqlalchemy] (>=14.0.1,<15.0.0)",
+    "fastapi-admin @ git+https://github.com/fastapi-admin/fastapi-admin.git",
+    "sqladmin (>=0.20.1,<0.21.0)",
+    "fastapi-users-db-sqlalchemy (>=7.0.0,<8.0.0)",
+    "asyncpg (>=0.30.0,<0.31.0)",
 ]
 
 [tool.poetry]

@@ -1,5 +1,6 @@
 from enum import Enum
 
+from fastapi_users import schemas
 from pydantic import BaseModel
 
 
@@ -34,3 +35,21 @@ class AssistentResponse(BaseModel):
     sql_script_result: list[list[str]] | str
     explanation: str
     message_id: int
+
+
+class UserRead(schemas.BaseUser[int]):
+    """Схема для чтения пользователя."""
+
+    username: str
+
+
+class UserCreate(schemas.BaseUserCreate):
+    """Схема для создания пользователя."""
+
+    username: str
+
+
+class UserUpdate(schemas.BaseUserUpdate):
+    """Схема для изменения пользователя."""
+
+    username: str

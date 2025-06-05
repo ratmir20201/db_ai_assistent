@@ -3,11 +3,14 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
+from admin.model_admin import UserAdmin  # noqa
 from alembic import context
 from config import settings
 from database.base import Base
-from models.message_review import MessageReview
-from models.bot_message import BotMessage
+from models.access_token import AccessToken  # noqa
+from models.bot_message import BotMessage  # noqa
+from models.message_review import MessageReview  # noqa
+from models.user import User  # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -40,8 +40,40 @@ class DbSettings(BaseSettings):
             name=self.name,
         )
 
+    @property
+    def async_db_url(self) -> str:
+        return "postgresql+asyncpg://{user}:{password}@{host}:{port}/{name}".format(
+            user=self.user,
+            password=self.password,
+            host=self.host,
+            port=self.port,
+            name=self.name,
+        )
+
     class Config:
         env_prefix = "DB__"
+
+
+class AccessTokenSettings(BaseSettings):
+    """Настройки токена для аутентификации."""
+
+    lifetime_seconds: int = 3600  # Кол-во секунд которое хранится токен
+    reset_password_token_secret: str = ""
+    verification_token_secret: str = ""
+
+    class Config:
+        env_prefix = "ACCESS_TOKEN__"
+
+
+class ApiSettings(BaseSettings):
+    """Настройки api сервера."""
+
+    superuser_name: str = "admin"
+    superuser_email: str = "admin@admin.com"
+    superuser_password: str = "admin"
+
+    class Config:
+        env_prefix = "API__"
 
 
 class VerticaSettings(BaseSettings):
@@ -87,6 +119,8 @@ class Settings(BaseSettings):
 
     # parse: ParsingSettings = ParsingSettings()
     redis: RedisSettings = RedisSettings()
+    api: ApiSettings = ApiSettings()
+    access_token: AccessTokenSettings = AccessTokenSettings()
     vertica: VerticaSettings = VerticaSettings()
     db: DbSettings = DbSettings()
 
