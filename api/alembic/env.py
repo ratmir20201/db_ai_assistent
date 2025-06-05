@@ -9,7 +9,8 @@ from config import settings
 from database.base import Base
 from models.access_token import AccessToken  # noqa
 from models.bot_message import BotMessage  # noqa
-from models.message_review import MessageReview  # noqa
+from models.message_feedback import MessageFeedback  # noqa
+from models.message_feedback import MessageReview  # noqa
 from models.user import User  # noqa
 
 # this is the Alembic Config object, which provides

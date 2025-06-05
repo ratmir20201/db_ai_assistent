@@ -16,12 +16,13 @@ def ask_bot(
     user_request: UserRequest,
     request: Request,
     session: Session = Depends(get_session),
-    current_user: User = Depends(fastapi_users.current_user()),
+    user: User = Depends(fastapi_users.current_user()),
 ) -> AssistentResponse:
     response = get_sql_query_explanation_result_message_id(
         user_request,
         request,
         session,
+        user,
     )
 
     return AssistentResponse(**response)

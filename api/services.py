@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from crud.messages import create_bot_message
 from llms.base_llm import BaseLLM
 from llms.llms import get_llm_by_type
+from models.user import User
 from redis_history import get_history
 from schemas import UserRequest
 
@@ -14,6 +15,7 @@ def get_sql_query_explanation_result_message_id(
     user_request: UserRequest,
     request: Request,
     session: Session,
+    user: User,
 ) -> dict[str, Any]:
     """
     Возвращает sql-запрос сгенерированный llm, объяснение и результат его выполнения.
@@ -38,6 +40,8 @@ def get_sql_query_explanation_result_message_id(
         llm_text=llm_response,
         user_question=user_request.question,
         translated_user_question=llm.translated_user_question,
+        llm_model=user_request.llm_type,
+        user_id=user.id,
     )
 
     if isinstance(llm_response, tuple):

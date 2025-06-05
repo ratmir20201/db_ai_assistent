@@ -6,24 +6,6 @@ document.addEventListener('DOMContentLoaded', async function() {
   const sendButton = document.getElementById('sendButton');
   const sql_required = document.getElementById('sqlSwitcher');
 
-  // const response = await fetch("http://192.168.99.140:8000/auth/current-user", {
-  //   method: "GET",
-  //   credentials: "include",
-  // });
-  //
-  // console.log(response, response.ok);
-  //
-  // if (!response.ok) {
-  //   window.location.href = "/login";
-  //   return;
-  // }
-  //
-  // const data = await response.json();
-  // if (!data || !data.username) {
-  //   window.location.href = "/login";
-  //   return;
-  // }
-
   function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
       const r = Math.random() * 16 | 0;
@@ -63,7 +45,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     }, 500)
 
 
-    fetch("http://192.168.99.140:8000/api/chat/messages", {
+    // fetch("http://192.168.99.140:8000/api/chat/messages", {
+    fetch("http://localhost:8000/api/chat/messages", {
       method: "POST",
       credentials: "include",
       headers: {
@@ -145,24 +128,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     const likeBtn = messageElement.querySelector(".like-btn")
     const dislikeBtn = messageElement.querySelector(".dislike-btn")
     let isRated = false;
+    let currentRating = null;
 
-    async function handleRating(type) {
-      if (isRated) return;
+    async function sendRatingRequest(type) {
+      const url = `http://localhost:8000/api/messages/${messageId}/${type}`;
+    // const url = `http://192.168.99.140:8000/api/messages/${messageId}/${type}`
 
-      isRated = true;
-      likeBtn.disabled = true;
-      dislikeBtn.disabled = true;
-
-      if (type === "like") {
-        likeBtn.classList.add("active")
-        dislikeBtn.classList.remove("active");
-      } else {
-        dislikeBtn.classList.add("active");
-        likeBtn.classList.remove("active");
-      }
-
-      const url = `http://192.168.99.140:8000/api/messages/${messageId}/${type}`
-      await fetch(url, {
+      const response = await fetch(url, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -170,21 +142,75 @@ document.addEventListener('DOMContentLoaded', async function() {
           "accept": "application/json",
           "X-Session-ID": session_id
         },
-      })
-      .then(function (response) {
-        if (!response.ok) {
-          return response.json().then(err => Promise.reject(err));
-        }
-        return response.json();
-      })
-      .catch(error => {
-        console.error("Fetch error:", error);
-        alert(error.detail || "Ошибка запроса");
       });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || "Ошибка запроса");
+      }
+
+      return await response.json();
     }
 
-    likeBtn.addEventListener("click", () => handleRating("like"));
-    dislikeBtn.addEventListener("click", () => handleRating("dislike"));
+
+    // async function handleRating(type) {
+    //   if (isRated) return;
+    //
+    //   isRated = true;
+    //   likeBtn.disabled = true;
+    //   dislikeBtn.disabled = true;
+    //
+    //   if (type === "like") {
+    //     likeBtn.classList.add("active")
+    //     dislikeBtn.classList.remove("active");
+    //   } else {
+    //     dislikeBtn.classList.add("active");
+    //     likeBtn.classList.remove("active");
+    //   }
+    //
+    //   // const url = `http://192.168.99.140:8000/api/messages/${messageId}/${type}`
+    //   const url = `http://localhost:8000/api/messages/${messageId}/${type}`
+    //   await fetch(url, {
+    //     method: "POST",
+    //     credentials: "include",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       "accept": "application/json",
+    //       "X-Session-ID": session_id
+    //     },
+    //   })
+    //   .then(function (response) {
+    //     if (!response.ok) {
+    //       return response.json().then(err => Promise.reject(err));
+    //     }
+    //     return response.json();
+    //   })
+    //   .catch(error => {
+    //     console.error("Fetch error:", error);
+    //     alert(error.detail || "Ошибка запроса");
+    //   });
+    // }
+
+    function updateButtonStyles() {
+      likeBtn.classList.toggle("active", currentRating === "like");
+      dislikeBtn.classList.toggle("active", currentRating === "dislike");
+    }
+
+    likeBtn.addEventListener("click", async () => {
+      if (currentRating === "like") return;
+
+      await sendRatingRequest("like");
+      currentRating = "like";
+      updateButtonStyles();
+    });
+
+    dislikeBtn.addEventListener("click", async () => {
+      if (currentRating === "dislike") return;
+
+      await sendRatingRequest("dislike");
+      currentRating = "dislike";
+      updateButtonStyles();
+    });
   }
 
   sendButton.addEventListener("click", sendMessage);
