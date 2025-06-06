@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Админка - Управление пользователями</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+<div class="container py-5">
+  <h1 class="mb-4">Управление пользователями</h1>
+
+  <!-- Форма создания пользователя -->
+  <div class="card mb-5">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Создать нового пользователя</h5>
+    </div>
+    <div class="card-body">
+      <form id="createUserForm">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="username" class="form-label"
+            >Имя пользователя</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" required/>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="password" class="form-label">Пароль</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              required
+            />
+          </div>
+<!--          <div class="col-md-6">-->
+<!--            <div class="form-check form-switch mt-4 pt-2">-->
+<!--              <input class="form-check-input" type="checkbox" id="is_superuser" style="width: 3em; height: 1.5em;">-->
+<!--              <label class="form-check-label ms-2" for="is_superuser">Суперпользователь</label>-->
+<!--            </div>-->
+<!--          </div>-->
+        </div>
+        <button type="submit" class="btn btn-primary">
+          Создать пользователя
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Список пользователей -->
+  <div class="card">
+    <div class="card-header bg-secondary text-white">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Список пользователей</h5>
+        <button id="refreshBtn" class="btn btn-sm btn-light">
+          Обновить
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div id="loadingIndicator" class="text-center loading py-3">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Загрузка...</span>
+        </div>
+        <p class="mt-2">Загрузка пользователей...</p>
+      </div>
+      <div id="usersList" class="row">
+        <!-- Пользователи будут загружены здесь -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно для сообщений -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="messageModalTitle">Уведомление</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body" id="messageModalBody">...</div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Закрыть
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/admin.js"></script>
+
+</body>
+</html>

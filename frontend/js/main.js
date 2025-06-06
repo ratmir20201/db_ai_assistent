@@ -1,3 +1,8 @@
+// Конфигурация API
+//const API_BASE_URL = "http://192.168.99.140:8000";
+const API_BASE_URL = "http://localhost:8000";
+
+
 document.addEventListener('DOMContentLoaded', async function() {
   const chatMessages = document.getElementById("chatMessages");
   const userInput = document.getElementById("userInput");
@@ -45,8 +50,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }, 500)
 
 
-    fetch("http://192.168.99.140:8000/api/chat/messages", {
-    // fetch("http://localhost:8000/api/chat/messages", {
+    fetch(`${API_BASE_URL}/api/chat/messages`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -131,10 +135,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     let currentRating = null;
 
     async function sendRatingRequest(type) {
-      // const url = `http://localhost:8000/api/messages/${messageId}/${type}`;
-      const url = `http://192.168.99.140:8000/api/messages/${messageId}/${type}`
-
-      const response = await fetch(url, {
+      const response = await fetch(`${API_BASE_URL}/api/messages/${messageId}/${type}`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -152,44 +153,6 @@ document.addEventListener('DOMContentLoaded', async function() {
       return await response.json();
     }
 
-
-    // async function handleRating(type) {
-    //   if (isRated) return;
-    //
-    //   isRated = true;
-    //   likeBtn.disabled = true;
-    //   dislikeBtn.disabled = true;
-    //
-    //   if (type === "like") {
-    //     likeBtn.classList.add("active")
-    //     dislikeBtn.classList.remove("active");
-    //   } else {
-    //     dislikeBtn.classList.add("active");
-    //     likeBtn.classList.remove("active");
-    //   }
-    //
-    //   // const url = `http://192.168.99.140:8000/api/messages/${messageId}/${type}`
-    //   const url = `http://localhost:8000/api/messages/${messageId}/${type}`
-    //   await fetch(url, {
-    //     method: "POST",
-    //     credentials: "include",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       "accept": "application/json",
-    //       "X-Session-ID": session_id
-    //     },
-    //   })
-    //   .then(function (response) {
-    //     if (!response.ok) {
-    //       return response.json().then(err => Promise.reject(err));
-    //     }
-    //     return response.json();
-    //   })
-    //   .catch(error => {
-    //     console.error("Fetch error:", error);
-    //     alert(error.detail || "Ошибка запроса");
-    //   });
-    // }
 
     function updateButtonStyles() {
       likeBtn.classList.toggle("active", currentRating === "like");
@@ -217,6 +180,20 @@ document.addEventListener('DOMContentLoaded', async function() {
   userInput.addEventListener("keypress", function(e) {
     if (e.key === "Enter") {
       sendMessage();
+    }
+  });
+
+
+  document.getElementById('exitButton').addEventListener('click', async () => {
+   const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+    });
+
+    if (response.ok) {
+      window.location.href = "/login";
+    } else {
+      alert("Ошибка при выходе");
     }
   });
 

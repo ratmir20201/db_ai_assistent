@@ -41,13 +41,15 @@ class UserRead(schemas.BaseUser[int]):
     """Схема для чтения пользователя."""
 
     username: str
+    email: str
+    is_superuser: bool
 
 
 class UserCreate(schemas.BaseUserCreate):
     """Схема для создания пользователя."""
 
     username: str
-    password: str
+    is_superuser: bool = False
 
 
 class UserUpdate(schemas.BaseUserUpdate):

@@ -4,6 +4,7 @@ from fastapi_users import FastAPIUsers
 from auth.backend import auth_backend
 from auth.user_manager import get_user_manager
 from models.user import User
+from schemas import UserRead, UserCreate
 
 fastapi_users = FastAPIUsers[User, int](
     get_user_manager,
@@ -19,4 +20,10 @@ router = APIRouter(
 # /logout
 router.include_router(
     router=fastapi_users.get_auth_router(auth_backend),
+)
+
+
+# /register
+router.include_router(
+    router=fastapi_users.get_register_router(UserRead, UserCreate),
 )
